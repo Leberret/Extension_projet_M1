@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="DICOM_3Dmouse.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DICOM_3Dmouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Read_data_3Dmouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\charset.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\data_dict.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\data_element.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\data_sequence.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\data_set.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\defs.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\dicom_file.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\dicom_reader.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\full_read_handler.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\logger.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\util.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm\write_visitor.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Read_data_3Dmouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\charset.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\config.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\data_dict.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\data_element.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\data_sequence.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\data_set.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\defs.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\dicom_file.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\dicom_reader.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\full_read_handler.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\logger.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\read_handler.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\reader.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\singleton_base.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\util.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\visitor.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\write_visitor.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm\writer.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="dcm\CMakeLists.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="dcm\dict.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dcm\config.h.in">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="dcm\dcm.pro">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="dcm\dict.inl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="dcm\dict.py">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="dcm\dict_vm.inl">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Widget3D.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="DICOM_3Dmouse.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="DICOM_3Dmouse.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

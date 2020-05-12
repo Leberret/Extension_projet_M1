@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7269F9C6-B818-4B83-9351-BCE0CFED46B7}</ProjectGuid>
+    <Keyword>QtVS_v302</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>DCMExemple;include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <QtInstall>msvc2017_64</QtInstall>
+    <QtModules> 3dcore 3dextras;core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtInstall>msvc2017_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <AdditionalIncludeDirectories>dcm;Inc;boost_1_72_0;dcm-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>boost_1_72_0\lib64-msvc-14.2;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(Qt_LIBS_);opencv_world412d.lib;siapp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat />
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <QtUic Include="DICOM_3Dmouse.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="DICOM_3Dmouse.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dcm\charset.cpp" />
+    <ClCompile Include="dcm\data_dict.cpp" />
+    <ClCompile Include="dcm\data_element.cpp" />
+    <ClCompile Include="dcm\data_sequence.cpp" />
+    <ClCompile Include="dcm\data_set.cpp" />
+    <ClCompile Include="dcm\defs.cpp" />
+    <ClCompile Include="dcm\dicom_file.cpp" />
+    <ClCompile Include="dcm\dicom_reader.cpp" />
+    <ClCompile Include="dcm\full_read_handler.cpp" />
+    <ClCompile Include="dcm\logger.cpp" />
+    <ClCompile Include="dcm\util.cpp" />
+    <ClCompile Include="dcm\write_visitor.cpp" />
+    <ClCompile Include="DICOM_3Dmouse.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Read_data_3Dmouse.cpp" />
+    <ClCompile Include="Scene3D.cpp" />
+    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="Widget3D.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dcm\charset.h" />
+    <ClInclude Include="dcm\config.h" />
+    <ClInclude Include="dcm\data_dict.h" />
+    <ClInclude Include="dcm\data_element.h" />
+    <ClInclude Include="dcm\data_sequence.h" />
+    <ClInclude Include="dcm\data_set.h" />
+    <ClInclude Include="dcm\defs.h" />
+    <ClInclude Include="dcm\dicom_file.h" />
+    <ClInclude Include="dcm\dicom_reader.h" />
+    <ClInclude Include="dcm\full_read_handler.h" />
+    <ClInclude Include="dcm\logger.h" />
+    <ClInclude Include="dcm\reader.h" />
+    <ClInclude Include="dcm\read_handler.h" />
+    <ClInclude Include="dcm\singleton_base.h" />
+    <ClInclude Include="dcm\util.h" />
+    <ClInclude Include="dcm\visitor.h" />
+    <ClInclude Include="dcm\writer.h" />
+    <ClInclude Include="dcm\write_visitor.h" />
+    <ClInclude Include="Read_data_3Dmouse.h" />
+    <ClInclude Include="Scene3D.h" />
+    <ClInclude Include="utils.h" />
+    <QtMoc Include="Widget3D.h" />
+    <QtMoc Include="DICOM_3Dmouse.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="dcm\CMakeLists.txt" />
+    <Text Include="dcm\dict.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dcm\config.h.in" />
+    <None Include="dcm\dcm.pro" />
+    <None Include="dcm\dict.inl" />
+    <None Include="dcm\dict.py" />
+    <None Include="dcm\dict_vm.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
