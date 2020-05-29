@@ -12,6 +12,9 @@
 //Initialisation des variables globales
 INT         Coupe, Min, Max;
 INT			mode3D;
+INT         ligne;
+INT         colonne;
+QVector<int>* allpixels;
 
 /*--------------------------------------------------------------------------
 * Fonction : ALLPixels()
@@ -31,26 +34,7 @@ QVector<int>* ALLPixels(vector<unsigned short>* pixels, QVector<int>* allpixels)
 }
 
 /*--------------------------------------------------------------------------
-* Fonction : Supprimer()
-*
-* Description : Suppression des images et du dossier
-*
-* Arguments : aucun
-*
-* Valeur retournée : aucune
-*--------------------------------------------------------------------------*/
-void Interface::Supprimer()
-{
-    if (*NbFichiers == 0) //Condition d'existance des images
-        return;
-    QDirIterator direction("Images", QDir::Files | QDir::NoSymLinks);// Obtenir l'arborescence des fichiers
-    while (direction.hasNext()) //tant qu'il reste des dossier dans le fichier
-        remove(direction.next().toStdString().c_str()); //Ajout de tous les chemins dans une liste
-    _rmdir("Images");//Suppression du dossier
-}
-
-/*--------------------------------------------------------------------------
-* Fonction : AppercuVisualisation3D()
+* Fonction : Affichage3D()
 *
 * Description : Création d'un widget permettant l'appercu d'une coupe et contenant différents
 * outils de parametrage (intensité, transparence et choix des coupes)
@@ -59,362 +43,15 @@ void Interface::Supprimer()
 *
 * Valeur retournée : aucune
 *--------------------------------------------------------------------------*/
-void Interface::AppercuVisualisation3D()
+void Interface::Affichage3D()
 {
     if (*NbFichiers == 0) //Condition d'existance des images
         return;
 
-    //Création d'un dossier dans lequel mettre les images
-    _mkdir("Images");
-
-    *souris3D = 0; //souris3D non active
-
-    //Init du Widget
-    WidgetAppercu3D = new QWidget;
-    //Init des labels
-    LabelVisuImage = new QLabel(); 
-    LabelSaisieMin = new QLabel();
-    LabelSaisieMax = new QLabel();
-    LabelSliderIntensite = new QLabel();
-    LabelSliderTransparence = new QLabel();
-    //Init du layout
-    LayoutVisuImage = new QGridLayout;
-    //Init du menu déroulant de sélection des coupes
-    comboBoxVisu = new QComboBox();
-    //Init des curseurs
-    SliderVisuIntensite = new QSlider(Qt::Horizontal);
-    SliderVisuTransparence = new QSlider(Qt::Horizontal);
-    //Init des zones de saisie
-    LineEditSaisieMin = new QLineEdit();
-    LineEditSaisieMax = new QLineEdit();
-    //init du Bouton valider
-    validerVisu = new QPushButton("Valider");
-
-    *Mode = 3; //Mode 3 = Appercu
-
-    //Passage en noir et blanc par défaut pour la visualisation
-    *NbCouleurs = 0;
-
-    //Appercu en fonction de la coupe selectionnée
-    switch (*CoupeVisu)
-    {
-    case 0:
-        GestionImages(slider1->value());
-        break;
-    case 1:
-        GestionImagesLignes(slider2->value());
-        break;
-    case 2:
-        GestionImagesColonnes(slider3->value());
-        break;
-    }
-    *Mode = 0; //Mode 0 = retour du mode à l'état initial
-
-    //Attribution des paramètres
-    SliderVisuIntensite->setRange(0, 255);
-    SliderVisuTransparence->setRange(0, 255);
-    LabelSaisieMin->setText("Image initiale :");
-    LabelSaisieMax->setText("Image finale :");
-    LabelSliderIntensite->setText("Reglage intensite :");
-    LabelSliderTransparence->setText("Reglage transparence :");
-    comboBoxVisu->addItem("Coupe 1");
-    comboBoxVisu->addItem("Coupe 2");
-    comboBoxVisu->addItem("Coupe 3");
-    comboBoxVisu->setFixedSize(100, 22);
-    comboBoxVisu->setStyleSheet("color: rgb(30,30,30);"
-        "background-color:rgb(230,230,230);"
-        "selection-color:rgb(230,230,230)  ;"
-        "border-radius: 0px;"
-        "selection-background-color: rgb(30,30,30);");
-    LineEditSaisieMax->setStyleSheet("color: rgb(30,30,30);"
-        "background-color:rgb(230,230,230);"
-        "selection-color:rgb(30,30,30)  ;"
-        "border-radius: 0px;"
-        "selection-background-color: rgb(230,230,230);");
-    LineEditSaisieMin->setStyleSheet("color:rgb(30,30,30);"
-        "background-color:rgb(230,230,230);"
-        "selection-color:rgb(30,30,30)  ;"
-        "border-radius: 0px;"
-        "selection-background-color: rgb(230,230,230);");
-    //Mise en place des connexions
-    connect(comboBoxVisu, SIGNAL(activated(int)), this, SLOT(SelectCoupes(int)));
-    connect(SliderVisuIntensite, SIGNAL(valueChanged(int)), this, SLOT(AfficheIntensiteTransparence()));
-    connect(SliderVisuTransparence, SIGNAL(valueChanged(int)), this, SLOT(AfficheIntensiteTransparence()));
-    connect(LineEditSaisieMin, SIGNAL(textChanged(QString)), this, SLOT(FirstImage(QString)));
-    connect(LineEditSaisieMax, SIGNAL(textChanged(QString)), this, SLOT(LastImage(QString)));
-    connect(validerVisu, SIGNAL(clicked()), this, SLOT(Enregistre()));
-
-    //Ajout des outils au Layout
-    LayoutVisuImage->addWidget(comboBoxVisu, 1, 1, 1, 1);
-    LayoutVisuImage->addWidget(LabelSliderIntensite, 2, 0, 1, 1);
-    LayoutVisuImage->addWidget(LabelSliderTransparence, 3, 0, 1, 1);
-    LayoutVisuImage->addWidget(SliderVisuIntensite, 2, 1, 1, 2);
-    LayoutVisuImage->addWidget(SliderVisuTransparence, 3, 1, 1, 2);
-    LayoutVisuImage->addWidget(LabelSaisieMin, 4, 0, 1, 1);
-    LayoutVisuImage->addWidget(LabelSaisieMax, 5, 0, 1, 1);
-    LayoutVisuImage->addWidget(LineEditSaisieMin, 4, 1, 1, 2);
-    LayoutVisuImage->addWidget(LineEditSaisieMax, 5, 1, 1, 2);
-    LayoutVisuImage->addWidget(validerVisu, 6, 0, 1, 3);
-
-    //Paramétrage du style du Widget
-    WidgetAppercu3D->setWindowTitle("Apercu de visualisation pour reconstitution 3D");//titre fenetre
-    WidgetAppercu3D->setWindowIcon(QIcon("icon.png"));//Mettre un Icon a la fenetre
-    WidgetAppercu3D->setLayout(LayoutVisuImage);
-    WidgetAppercu3D->setStyleSheet("color: white;"
-        "background-color:rgb(30,30,30);"
-        "selection-color: white;"
-        "border-radius: 0px;"
-        "selection-background-color: darkGrey;");
-    //Affichage fenêtre
-    WidgetAppercu3D->show();
-
-}
-
-/*--------------------------------------------------------------------------
-* Fonction : LastImage()
-*
-* Description : Récuperation de la dernière image choisie par l'utilisateur   
-* et affiche de celle-ci en appercu
-*
-* Arguments : SaisieMax : Valeur max saisie  par l'utilisateur
-*
-* Valeur retournée : aucune
-*--------------------------------------------------------------------------*/
-void Interface::LastImage(QString SaisieMax)
-{
-    //Verification si la valeur saisie est un entier
-    if (!SaisieMax.toInt())
-        return;
-
-    //Mémorisation de l'entier saisi
-    *imageMax = SaisieMax.toInt();
-
-    *Mode = 3; //Mode 3 = Appercu
-
-    //Init de la QMessageBox
-    QMessageBox MessageErreur;
-    MessageErreur.setText("Valeur saisie incorrecte");
-
-    //Affichage de l'image saisie en fonction de la coupe
-    switch (*CoupeVisu)
-    {
-    case 0:
-        if (*imageMax < *NbFichiers && *imageMax >= 0)
-            GestionImages(*imageMax);
-        else {
-            MessageErreur.exec();
-            return;
-        }
-            
-        break;
-    case 1:
-        if (*imageMax < *rows && *imageMax > 0)
-            GestionImagesLignes(*imageMax);
-        else {
-            MessageErreur.exec();
-            return;
-        }
-        break;
-    case 2:
-        if (*imageMax < *cols && *imageMax > 0)
-            GestionImagesColonnes(*imageMax);
-        else {
-            MessageErreur.exec();
-            return;
-        }
-        break;
-    }
-    *Mode = 0; //Mode 0 = retour du mode à l'état initial 
-}
-
-/*--------------------------------------------------------------------------
-* Fonction : FirstImage()
-*
-* Description : Récuperation de la première image choisie par l'utilisateur
-* et affiche de celle-ci en appercu
-*
-* Arguments : SaisieMin : Valeur min saisie  par l'utilisateur
-*
-* Valeur retournée : aucune
-*--------------------------------------------------------------------------*/
-void Interface::FirstImage(QString SaisieMin)
-{
-    //Verification si la valeur saisie est un entier
-    if (!SaisieMin.toInt())
-        return;
-
-    //Mémorisation de l'entier saisi
-    *imageMin = SaisieMin.toInt();
-
-    *Mode = 3;//Mode 3 = Appercu
-
-    //Init de la QMessageBox
-    QMessageBox MessageErreur;
-    MessageErreur.setText("Valeur saisie incorrecte");
-
-    //Affichage de l'image saisie en fonction de la coupe
-    switch (*CoupeVisu)
-    {
-    case 0:
-        if (*imageMin >= 0 && *imageMin < *NbFichiers)
-            GestionImages(*imageMin);
-        else
-            return;
-        break;
-    case 1:
-        if (*imageMin >= 1 && *imageMin < *cols)
-            GestionImagesLignes(*imageMin);
-        else
-            return;
-        break;
-    case 2:
-        if (*imageMin >= 1 && *imageMin < *rows)
-            GestionImagesColonnes(*imageMin);
-        else
-            return;
-        break;
-    }
-    *Mode = 0; //Mode 0 = retour du mode à l'état initial 
-
-}
-
-/*--------------------------------------------------------------------------
-* Fonction : AfficheIntensiteTransparence()
-*
-* Description : Affichage de l'image saisie en fonction de la coupe et des
-* valeurs d'intensité et de transparence choisies
-*
-* Arguments : aucun
-*
-* Valeur retournée : aucune
-*--------------------------------------------------------------------------*/
-void Interface::AfficheIntensiteTransparence()
-{
-    *Mode = 3; //Mode 3 = Appercu
-
-    //Affichage de l'image saisie en fonction de la coupe
-    switch (*CoupeVisu)
-    {
-    case 0:
-        GestionImages(slider1->value());
-        break;
-    case 1:
-        GestionImagesLignes(slider2->value());
-        break;
-    case 2:
-        GestionImagesColonnes(slider3->value());
-        break;
-    }
-    *Mode = 0; //Mode 0 = retour du mode à l'état initial 
-}
-
-/*--------------------------------------------------------------------------
-* Fonction : SelectCoupes()
-*
-* Description : Affichage instantané de l'image saisie en fonction de la coupe 
-* choisie
-*
-* Arguments : valeurCoupe : valeur renvoyée par le menu déroulant
-*
-* Valeur retournée : aucune
-*--------------------------------------------------------------------------*/
-void Interface::SelectCoupes(int valeurCoupe)
-{
-    //Mémorisation de la valeur de la coupe
-    *CoupeVisu = valeurCoupe;
-
-    *Mode = 3;//Mode 3 = Appercu
-
-    //Affichage de l'image saisie en fonction de la coupe
-    switch (*CoupeVisu)
-    {
-    case 0:
-        GestionImages(slider1->value());
-        break;
-    case 1:
-        GestionImagesLignes(slider2->value());
-        break;
-    case 2:
-        GestionImagesColonnes(slider3->value());
-        break;
-    }
-    *Mode = 0;
-
-}
-
-/*--------------------------------------------------------------------------
-* Fonction : Enregistre()
-*
-* Description : Affichage instantané de l'image saisie en fonction de la coupe
-* choisie
-*
-* Arguments : valeurCoupe : valeur renvoyée par le menu déroulant
-*
-* Valeur retournée : aucune
-*--------------------------------------------------------------------------*/
-void Interface::Enregistre()
-{
-    //Fermeture de la fenêtre d'aperçue
-    WidgetAppercu3D->close();
-
-    Coupe = *CoupeVisu + 1;
-
-    *Mode = 1;//Mode 1 = enregistrement
-
-    *NbCouleurs = 0; //Image en nuances de gris
-
-    //Association prmière et denière image à Scene3D
-    Min = *imageMin;
-    Max = *imageMax;
-
-    //initilisation du NumImageTx
-    int cpt = Min;
-
-    //Barre de chargement
-    QProgressDialog progress("Enregistrement des "+QString::number(Max-Min)+" images", "Cancel", Min, Max,this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setWindowTitle("Chargement");
-    progress.setMinimumSize(400, 50);
-    progress.setCancelButton(0);
-    progress.setMinimumDuration(0);
-
-    //Enregistrement pour toutes les images entre la première et la dernière en fonction de la coupe
-    switch (Coupe)
-    {
-    case 1:
-        for (cpt; cpt <= Max; cpt++) {
-            progress.setValue(cpt);
-            GestionImages(cpt);
-        }
-        progress.setValue(Max);
-        break;
-    case 2:
-        for (cpt; cpt <= Max; cpt++) {
-            progress.setValue(cpt);
-            GestionImagesLignes(cpt);
-        }
-        progress.setValue(Max);
-        break;
-    case 3:
-        for (cpt; cpt <= Max; cpt++) {
-            progress.setValue(cpt);
-            GestionImagesColonnes(cpt);
-        }
-        progress.setValue(Max);
-        break;
-    }
-
-    *Mode = 0; //Mode 0 = retour du mode à l'état initial 
-
-    GestionImages(slider1->value());
-    GestionImagesLignes(slider2->value());
-    GestionImagesColonnes(slider3->value());
-
-    //Libération de la mémoire
-    delete WidgetAppercu3D;
-
     //Lancement interface 3D
     Widget3D* Scene3D = new Widget3D();
+
+
 }
 
 /*--------------------------------------------------------------------------
@@ -695,8 +332,8 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
         //Ajout valeur barre de chargement
         Chargement->setValue(NbFichier);
 
-        *rows = getUShortTagValue(0x00280010, dataDcm);//Nombre de lignes
-        *cols = getUShortTagValue(0x00280011, dataDcm);//Nombre de colonnes
+        ligne = getUShortTagValue(0x00280010, dataDcm);//Nombre de lignes
+        colonne = getUShortTagValue(0x00280011, dataDcm);//Nombre de colonnes
 
         pixels = readPixels(dataDcm); //Lecture des pixesls
         allpixels = ALLPixels(pixels, allpixels); //Tous les pixels stockés dans un vecteur
@@ -716,19 +353,19 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     SpinBox3->setButtonSymbols(QSpinBox::NoButtons);
 
     SpinBox1->setRange(0, *NbFichiers - 1);
-    SpinBox2->setRange(0, *rows - 1);
-    SpinBox3->setRange(0, *cols - 1);
+    SpinBox2->setRange(0, ligne - 1);
+    SpinBox3->setRange(0, colonne - 1);
 
     SpinBox1->setStyleSheet("QSpinBox { border: 0px solid grey; border-radius: 4px; background-color: rgb(230,230,230); color: black }");
     SpinBox2->setStyleSheet("QSpinBox { border: 0px solid grey; border-radius: 4px; background-color: rgb(230,230,230); color: black }");
     SpinBox3->setStyleSheet("QSpinBox { border: 0px solid grey; border-radius: 4px; background-color: rgb(230,230,230); color: black }");
     
     slider1->setRange(0, *NbFichiers - 1);
-    slider2->setRange(1, *rows - 1); //Valeurs du slider selon nb de fichiers
-    slider3->setRange(1, *cols); //Valeurs du slider selon nb de fichiers
+    slider2->setRange(1, ligne - 1); //Valeurs du slider selon nb de fichiers
+    slider3->setRange(1, colonne); //Valeurs du slider selon nb de fichiers
     slider1->setValue(*NbFichiers / 2);//Positionnement du cuseur a la moitié
-    slider2->setValue(*rows / 2);//Positionnement du cuseur a la moitié
-    slider3->setValue(*cols / 2);//Positionnement du cuseur a la moitié
+    slider2->setValue(ligne / 2);//Positionnement du cuseur a la moitié
+    slider3->setValue(colonne / 2);//Positionnement du cuseur a la moitié
 
     layout->addWidget(SpinBox1, 0, 0, Qt::AlignCenter);
     layout->addWidget(SpinBox2, 0, 1, Qt::AlignCenter);
@@ -742,9 +379,9 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     *lastTxValue = 0;
     *NumImageTx = *NbFichiers / 2;
     *lastTyValue = 0;
-    *NumImageTy = *rows / 2;
+    *NumImageTy = ligne / 2;
     *lastTzValue = 0;
-    *NumImageTz = *cols / 2;
+    *NumImageTz = colonne / 2;
     *lastRyValue = 0;
     *variationIntensite = 0;// sliderIntensite->value();
 
@@ -867,17 +504,17 @@ void Interface::MajClicCoupe1(QMouseEvent* e)
 
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
-        if (*rows < 400 && *cols < 400) //Si image de petite taille
+        if (ligne < 400 && colonne < 400) //Si image de petite taille
         {
             //facteur 1.75 pour prendre en compte le zoom
-            tailleLimite_X = (label_x + *cols * 1.75);
-            tailleLimite_Y = (label_y + *rows * 1.75);
+            tailleLimite_X = (label_x + colonne * 1.75);
+            tailleLimite_Y = (label_y + ligne * 1.75);
             NouvelleImageCoupe3 = (posi_x - label_x) / 1.75;
             NouvelleImageCoupe2 = (posi_y - label_y) / 1.75;
         }
         else { //Si grande image
-            tailleLimite_X = (label_x + *cols);
-            tailleLimite_Y = (label_y + *rows);
+            tailleLimite_X = (label_x + colonne);
+            tailleLimite_Y = (label_y + ligne);
             NouvelleImageCoupe3 = (posi_x - label_x);
             NouvelleImageCoupe2 = (posi_y - label_y);
         }
@@ -931,17 +568,17 @@ void Interface::MajClicCoupe2(QMouseEvent* e)
     
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
-        if (*rows < 400 && *cols < 400) //Si image de petite taille
+        if (ligne < 400 && colonne < 400) //Si image de petite taille
         {
             //facteur 1.75 pour prendre en compte le zoom
             tailleLimite_X = (label_x + *NbFichiers * 1.75);
-            tailleLimite_Y = (label_y + *rows * 1.75);
+            tailleLimite_Y = (label_y + ligne * 1.75);
             NouvelleImageCoupe1 = (posi_x - label_x) / 1.75;
             NouvelleImageCoupe3 = (posi_y - label_y) / 1.75;
         }
         else { //Si grande image
             tailleLimite_X = (label_x + *NbFichiers);
-            tailleLimite_Y = (label_y + *rows);
+            tailleLimite_Y = (label_y + ligne);
             NouvelleImageCoupe1 = (posi_x - label_x);
             NouvelleImageCoupe3 = (posi_y - label_y);
         }
@@ -994,17 +631,17 @@ void Interface::MajClicCoupe3(QMouseEvent* e)
 
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
-        if (*rows < 400 && *cols < 400) //Si image de petite taille
+        if (ligne < 400 && colonne < 400) //Si image de petite taille
         {
             //facteur 1.75 pour prendre en compte le zoom
             tailleLimite_X = (label_x + *NbFichiers * 1.75);
-            tailleLimite_Y = (label_y + *rows * 1.75);
+            tailleLimite_Y = (label_y + ligne * 1.75);
             NouvelleImageCoupe1 = (posi_x - label_x) / 1.75;
             NouvelleImageCoupe2 = (posi_y - label_y) / 1.75;
         }
         else { //Si grande image
             tailleLimite_X = (label_x + *NbFichiers);
-            tailleLimite_Y = (label_y + *rows);
+            tailleLimite_Y = (label_y + ligne);
             NouvelleImageCoupe1 = (posi_x - label_x);
             NouvelleImageCoupe2 = (posi_y - label_y);
         }
@@ -1286,10 +923,10 @@ void Interface::Action3DMouseTx() {
         NbImages = *NbFichiers;
         break;
     case 2:
-        NbImages = *cols;
+        NbImages = colonne;
         break;
     case 3:
-        NbImages = *cols;
+        NbImages = colonne;
         break;
     }
 
@@ -1377,13 +1014,13 @@ void Interface::Action3DMouseTy() {
     switch (*coupe)
     {
     case 1:
-        NbImages=*rows;
+        NbImages=ligne;
         break;
     case 2:
         NbImages = *NbFichiers;
         break;
     case 3:
-        NbImages = *rows;
+        NbImages = ligne;
         break;
     }
 
@@ -1430,8 +1067,8 @@ void Interface::Action3DMouseTy() {
     else if (i <= 0) {
         i = 1;
     }
-    else if (i >= *rows) {
-        i = *cols - 1;
+    else if (i >= ligne) {
+        i = colonne - 1;
     }
     else if (pTy == 0 && pTy < 50) {
         return;
@@ -1476,10 +1113,10 @@ void Interface::Action3DMouseTz() {
     switch (*coupe)
     {
     case 1:
-        NbImages = *cols;
+        NbImages = colonne;
         break;
     case 2:
-        NbImages = *rows;
+        NbImages = ligne;
         break;
     case 3:
         NbImages = *NbFichiers;
@@ -1530,8 +1167,8 @@ void Interface::Action3DMouseTz() {
     else if (i <= 0) {
         i = 1;
     }
-    else if (i >= *cols) {
-        i = *cols - 1;
+    else if (i >= colonne) {
+        i = colonne - 1;
     }
     else if (pTz == 0 && pTy < 50) {
         return;
@@ -1715,13 +1352,13 @@ void Interface::SaveAs() {
     QPoint coord3 = imageLabel3->pos();
     int label3_y = coord3.y();
 
-    if (*rows < 400 && *cols < 400) //Si image de petite taille
+    if (ligne < 400 && colonne < 400) //Si image de petite taille
     {
         //facteur 1.75 pour prendre en compte le zoom
-        tailleLimite_Y = (label3_y + *rows * 1.75);
+        tailleLimite_Y = (label3_y + ligne * 1.75);
     }
     else { //Si grande image
-        tailleLimite_Y = (label3_y + *rows);
+        tailleLimite_Y = (label3_y + ligne);
     }
 
     //définition de la hauteur et de la largeur de capture
@@ -1752,7 +1389,7 @@ void Interface::SaveAs() {
 void Interface::GestionImages(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
-    Mat image = Mat::zeros(*rows, *cols, CV_8UC1);
+    Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
 
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
@@ -1766,7 +1403,7 @@ void Interface::GestionImages(int NumeroImage)
 
     //Navigation dans toute l'image prise en argument
     int k = 0;
-    for (k = (*cols * *rows) * NumeroImage; k < (*cols * *rows) * (NumeroImage + 1); k++)
+    for (k = (colonne * ligne) * NumeroImage; k < (colonne * ligne) * (NumeroImage + 1); k++)
     {
         //Condition d'isolement de l'intensité max
         if ((*allpixels)[k] > * IntensiteMaxInitCoupe1 && (*allpixels)[k] < 6000)
@@ -1782,7 +1419,7 @@ void Interface::GestionImages(int NumeroImage)
         valMax = *IntensiteVariableCoupe1;//Sinon modifié
 
     //Récupération de l'emplacement dans le vecteur global de la première valeur de l'image prise en argument 
-    k = (*cols * *rows) * NumeroImage;
+    k = (colonne * ligne) * NumeroImage;
 
     //Reconstrution de l'image dans la matrice
     for (int i = 0; i < l; i++)
@@ -1941,7 +1578,7 @@ void Interface::GestionImages(int NumeroImage)
 void Interface::GestionImagesLignes(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
-    Mat image = Mat::zeros(*NbFichiers - 1, *cols, CV_8UC1);//Image de la taille obtenue avec data
+    Mat image = Mat::zeros(*NbFichiers - 1, colonne, CV_8UC1);//Image de la taille obtenue avec data
     
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
@@ -1956,8 +1593,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     //Navigation dans toute l'image prise en argument
     int k = 0;
     vector<int> Valeurdefinitif;
-    for (int changementImag = 0; changementImag < (*allpixels).size(); changementImag += (*cols * *rows))
-        for (int nb = changementImag + (NumeroImage * *cols - 1); nb < changementImag + ((NumeroImage + 1) * *cols - 1); nb++)//Condition pour avoir l'image selon la bonne coupe (tel ligne)
+    for (int changementImag = 0; changementImag < (*allpixels).size(); changementImag += (colonne * ligne))
+        for (int nb = changementImag + (NumeroImage * colonne - 1); nb < changementImag + ((NumeroImage + 1) * colonne - 1); nb++)//Condition pour avoir l'image selon la bonne coupe (tel ligne)
         {
             Valeurdefinitif.push_back((*allpixels)[nb]);
         }
@@ -2138,7 +1775,7 @@ void Interface::GestionImagesLignes(int NumeroImage)
 void Interface::GestionImagesColonnes(int v)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
-    Mat image = Mat::zeros(*NbFichiers - 1, *rows, CV_8UC1);
+    Mat image = Mat::zeros(*NbFichiers - 1, ligne, CV_8UC1);
 
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
@@ -2153,7 +1790,7 @@ void Interface::GestionImagesColonnes(int v)
     //Navigation dans toute l'image prise en argument
     int k = 0;
     vector<int>Valeurdefinitif2; //Nouveau vecteur contenant les pixels de l'image
-    for (int nb = v; nb < (*allpixels).size(); nb += *cols)//Condition pour avoir l'image selon la bonne coupe 
+    for (int nb = v; nb < (*allpixels).size(); nb += colonne)//Condition pour avoir l'image selon la bonne coupe 
     {
         Valeurdefinitif2.push_back((*allpixels)[nb]);//Vecteur definitif avec valeurs de l'image a afficher (tel colonnes de chaque image)
     }
@@ -2355,7 +1992,7 @@ void Interface::mousePressEvent(QMouseEvent* e){
 *--------------------------------------------------------------------------*/
 void Interface::closeEvent(QCloseEvent* event)
 {
-    Supprimer();
+    //Supprimer();
     event->accept();
 
 }
@@ -2435,8 +2072,8 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     variationIntensite = new qint16;
     coupe = new qint16;
     Mode = new qint16;
-    cols = new qint16;//Colones
-    rows = new qint16;//Lignes
+    //cols = new qint16;//Colones
+    //rows = new qint16;//Lignes
     souris3D = new qint16;
     MenuSouris3D = new qint16;
     OnOffIntensite = new qint16;
@@ -2495,7 +2132,7 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     Affichage->addAction("HOT", this, SLOT(AffichageHot()));//Action pour couleur
     Affichage->addAction("PARULA", this, SLOT(AffichageParula()));//Action pour couleur
     Affichage->addAction("TWILIGHT SHIFTED", this, SLOT(AffichageTwilightShifted()));//Action pour couleur
-    Affichage->addAction("Passer en visualisation 3D", this, SLOT(AppercuVisualisation3D()));//Action d'affichage slider1
+    Affichage->addAction("Affichage 3D", this, SLOT(Affichage3D()));//Action d'affichage slider1
     Info->addAction("Informations patient", this, SLOT(displayTags()));//Connexion menu action
     file->addAction("Ouvrir", this, SLOT(ouvrirFichiers()));//Connexion menu action
     file->addAction("Supprimer", this, SLOT(Supprimer()));//Connexion menu action

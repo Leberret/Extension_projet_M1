@@ -144,6 +144,9 @@
     <ClInclude Include="dcm\writer.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="glut.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="dcm\CMakeLists.txt">

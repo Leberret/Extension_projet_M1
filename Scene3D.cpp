@@ -70,383 +70,185 @@ void My3DScene::init() {
 *
 * Valeur retournée : Aucune
 *--------------------------------------------------------------------------*/
-void My3DScene::createObjects()
+/*void My3DScene::createObjects()
 {
-    //Récupération de la coupe pour ajouter dans chemin d'accès
-    string coupe = to_string(Coupe);
-    int Milieu = (int)((Max - Min )/ 2);
-    int nbImage = Max - Milieu;
-    //Definition texture
-    Qt3DRender::QTextureLoader* loader;
+    
 
-    if ((int)(Max - Min) < 200) {
+    //for (int i = Min; i < Max; i++) {
+        
+        int c = 5;
+        int l = 5;
+        
+        int k = (colonne * ligne) * 100;
+        //int k = (c * l) * 100;
 
-        //De l'image de départ à l'image d'arrivée
-        for (int i=0; i < Milieu; i++)
-        {
-            //Répétition de la même image trois fois
-            for (int k = 0; k < 3; k += 1)
+        for (int i = 0; i < l; i++) {
+
+            for (int j = 0; j < c; j++)
             {
-                //--------------------------FACE RECTO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeMesh = new Qt3DExtras::QPlaneMesh(this->planeEntity);
-                this->planeMesh->setWidth(6);
-                this->planeMesh->setHeight(5);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
+                //int pixel = (*allpixels)[k];
+                int pixel = 100;
+                //if (pixel > 70) {
+                    cuboid = new Qt3DExtras::QCuboidMesh();
+                    cuboid->setXExtent(1);
+                    cuboid->setYExtent(1);
+                    cuboid->setZExtent(1);
+                    cuboid->setXYMeshResolution(QSize (1,1));
+                    cuboid->setXZMeshResolution(QSize(1, 1));
 
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, 0.02 * i + 0.005 * k, 0));
+                    Qt3DExtras::QPhongMaterial* cuboidMaterial = new Qt3DExtras::QPhongMaterial();
 
-                // Ajout texture à la face recto du plan, à partir d'une image locale suivant la valeur du NumImageTx i
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                string cheminimage;
-                string format = ".PNG";
-                string numero = to_string(nbImage +i);
-                cheminimage = "Images/Coupe" + coupe + "_" + numero + format;
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-                loader->setMirrored(false);//Garder le sens correct de l'image
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
 
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
+                    cuboidMaterial->setDiffuse(QColor(pixel, pixel, pixel));
+                    cuboidMaterial->setAmbient(QColor(pixel, pixel, pixel));
 
-                //--------------------------FACE VERSO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-                this->planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 180.0f)); //Copie de la texture à 180°
+                    cuboidTransform = new Qt3DCore::QTransform(cuboid);
+                    cuboidTransform->setTranslation(QVector3D((float)j, (float)i, 0.0));
 
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, 0.02 * i + 0.005 * k, 0));
+                    //Cuboid
+                    m_cuboidEntity = new Qt3DCore::QEntity(&this->scene);
+                    m_cuboidEntity->addComponent(cuboid);
+                    m_cuboidEntity->addComponent(cuboidMaterial);
+                    m_cuboidEntity->addComponent(cuboidTransform);
+                //}
+                
 
-                // Ajout de la même texture à la face verso du plan
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
 
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
+                k++; //Décalage d'une valeur dans le vecteur global
             }
         }
-        for (int i = 0; i < Milieu; i++)
-        {
-            //Répétition de la même image trois fois
-            for (int k = 0; k < 3; k += 1)
-            {
-                //--------------------------FACE RECTO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeMesh = new Qt3DExtras::QPlaneMesh(this->planeEntity);
-                this->planeMesh->setWidth(6);
-                this->planeMesh->setHeight(5);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
+                    
+    //}
+    
+}*/
 
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, -(0.02 * i + 0.005 * k), 0));
 
-                // Ajout texture à la face recto du plan, à partir d'une image locale suivant la valeur du NumImageTx i
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                string cheminimage;
-                string format = ".PNG";
-                string numero = to_string(nbImage -i);
-                cheminimage = "Images/Coupe" + coupe + "_" + numero + format;
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-                loader->setMirrored(false);//Garder le sens correct de l'image
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
-
-                //--------------------------FACE VERSO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-                this->planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 180.0f)); //Copie de la texture à 180°
-
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, -(0.02 * i + 0.005 * k), 0));
-
-                // Ajout de la même texture à la face verso du plan
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
-            }
-        }
-    }
-    else if((int)(Max - Min) >= 200 &&(int)( Max - Min) <= 300)
-    {
-        for (int i = 0; i < Milieu; i++)
-        {
-            //Répétition de la même image trois fois
-            for (int k = 0; k < 2; k += 1)
-            {
-                //--------------------------FACE RECTO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeMesh = new Qt3DExtras::QPlaneMesh(this->planeEntity);
-                this->planeMesh->setWidth(6);
-                this->planeMesh->setHeight(5);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, 0.02 * i + 0.01 * k, 0));
-
-                // Ajout texture à la face recto du plan, à partir d'une image locale suivant la valeur du NumImageTx i
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                string cheminimage;
-                string format = ".PNG";
-                string numero = to_string(nbImage +i);
-                cheminimage = "Images/Coupe" + coupe + "_" + numero + format;
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-                loader->setMirrored(false);//Garder le sens correct de l'image
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
-
-                //--------------------------FACE VERSO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-                this->planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 180.0f)); //Copie de la texture à 180°
-
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, 0.02 * i + 0.01 * k, 0));
-
-                // Ajout de la même texture à la face verso du plan
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
-            }
-        }
-        for (int i = 0; i < Milieu; i++)
-        {
-            //Répétition de la même image trois fois
-            for (int k = 0; k < 2; k += 1)
-            {
-                //--------------------------FACE RECTO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeMesh = new Qt3DExtras::QPlaneMesh(this->planeEntity);
-                this->planeMesh->setWidth(6);
-                this->planeMesh->setHeight(5);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, -(0.02 * i + 0.01 * k), 0));
-
-                // Ajout texture à la face recto du plan, à partir d'une image locale suivant la valeur du NumImageTx i
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                string cheminimage;
-                string format = ".PNG";
-                string numero = to_string(nbImage -i);
-                cheminimage = "Images/Coupe" + coupe + "_" + numero + format;
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-                loader->setMirrored(false);//Garder le sens correct de l'image
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
-
-                //--------------------------FACE VERSO---------------------------------------
-                //Initialisation Entité, plan et transform
-                this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-                this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-                this->planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 180.0f)); //Copie de la texture à 180°
-
-                //Translation pour décaler les images lors du changement de plan
-                this->planeTransform->setTranslation(QVector3D(0, -(0.02 * i + 0.01 * k), 0));
-
-                // Ajout de la même texture à la face verso du plan
-                loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-                this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-                loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-                this->planeTexture->setTexture(loader);
-
-                this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-                //Ajouts des différents composants à l'entité
-                this->planeEntity->addComponent(this->planeMesh);
-                this->planeEntity->addComponent(this->planeTexture);
-                this->planeEntity->addComponent(this->planeTransform);
-            }
-        }
-    }
-    else
-    {
-        //De l'image de départ à l'image d'arrivée
-        for (int i = 0; i < Milieu; i++)
-        {
-            //--------------------------FACE RECTO---------------------------------------
-            //Initialisation Entité, plan et transform
-            this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-            this->planeMesh = new Qt3DExtras::QPlaneMesh(this->planeEntity);
-            this->planeMesh->setWidth(6);
-            this->planeMesh->setHeight(5);
-            this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-
-            //Translation pour décaler les images lors du changement de plan
-            this->planeTransform->setTranslation(QVector3D(0, 0.01 * i, 0));
-
-            // Ajout texture à la face recto du plan, à partir d'une image locale suivant la valeur du NumImageTx i
-            loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-            this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-            string cheminimage;
-            string format = ".PNG";
-            string numero = to_string(nbImage +i);
-            cheminimage = "Images/Coupe" + coupe + "_" + numero + format;
-            loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-            this->planeTexture->setTexture(loader);
-            loader->setMirrored(false);//Garder le sens correct de l'image
-            this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-            //Ajouts des différents composants à l'entité
-            this->planeEntity->addComponent(this->planeMesh);
-            this->planeEntity->addComponent(this->planeTexture);
-            this->planeEntity->addComponent(this->planeTransform);
-
-            //--------------------------FACE VERSO---------------------------------------
-            //Initialisation Entité, plan et transform
-            this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-            this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-            this->planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 180.0f)); //Copie de la texture à 180°
-
-            //Translation pour décaler les images lors du changement de plan
-            this->planeTransform->setTranslation(QVector3D(0, 0.01 * i, 0));
-
-            // Ajout de la même texture à la face verso du plan
-            loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-            this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-            loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-            this->planeTexture->setTexture(loader);
-
-            this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-            //Ajouts des différents composants à l'entité
-            this->planeEntity->addComponent(this->planeMesh);
-            this->planeEntity->addComponent(this->planeTexture);
-            this->planeEntity->addComponent(this->planeTransform);
-        }
-        for (int i = 0; i < Milieu; i++)
-        {
-            //--------------------------FACE RECTO---------------------------------------
-            //Initialisation Entité, plan et transform
-            this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-            this->planeMesh = new Qt3DExtras::QPlaneMesh(this->planeEntity);
-            this->planeMesh->setWidth(6);
-            this->planeMesh->setHeight(5);
-            this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-
-            //Translation pour décaler les images lors du changement de plan
-            this->planeTransform->setTranslation(QVector3D(0, -(0.01 * i), 0));
-
-            // Ajout texture à la face recto du plan, à partir d'une image locale suivant la valeur du NumImageTx i
-            loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-            this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-            string cheminimage;
-            string format = ".PNG";
-            string numero = to_string(nbImage -i);
-            cheminimage = "Images/Coupe" + coupe + "_" + numero + format;
-            loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-            this->planeTexture->setTexture(loader);
-            loader->setMirrored(false);//Garder le sens correct de l'image
-            this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-            //Ajouts des différents composants à l'entité
-            this->planeEntity->addComponent(this->planeMesh);
-            this->planeEntity->addComponent(this->planeTexture);
-            this->planeEntity->addComponent(this->planeTransform);
-
-            //--------------------------FACE VERSO---------------------------------------
-            //Initialisation Entité, plan et transform
-            this->planeEntity = new Qt3DCore::QEntity(&this->scene);
-            this->planeTransform = new  Qt3DCore::QTransform(this->planeMesh);
-            this->planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 180.0f)); //Copie de la texture à 180°
-
-            //Translation pour décaler les images lors du changement de plan
-            this->planeTransform->setTranslation(QVector3D(0,-( 0.01 * i), 0));
-
-            // Ajout de la même texture à la face verso du plan
-            loader = new Qt3DRender::QTextureLoader(this->planeMesh);
-            this->planeTexture = new Qt3DExtras::QTextureMaterial(this->planeMesh);
-            loader->setSource(QUrl::fromLocalFile(QString::fromStdString(cheminimage)));
-            this->planeTexture->setTexture(loader);
-
-            this->planeTexture->setAlphaBlendingEnabled(true);//Rendre transparents les valeurs d'alpha à 0
-
-            //Ajouts des différents composants à l'entité
-            this->planeEntity->addComponent(this->planeMesh);
-            this->planeEntity->addComponent(this->planeTexture);
-            this->planeEntity->addComponent(this->planeTransform);
-        }
-    }
+void My3DScene::initializeGL()
+{
+    glClearColor(0, 0, 0, 1.0);
+    glShadeModel(GL_FLAT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_LIGHTING);
 }
 
-/*--------------------------------------------------------------------------
-* Fonction : createCamera()
-*
-* Description : Création de la caméra avec un point de vu central sur l'image centrale
-* et contrôle de la caméra avec la souris classique
-*(clic droit : rotaion, clic gauche : translation)
-*
-* Arguments : Aucun
-*
-* Valeur retournée : Aucune
-*--------------------------------------------------------------------------*/
-void My3DScene::createCamera()
+void My3DScene::resizeGL(int width, int height)
 {
-
-    //Initialisation de la caméra
-    this->camera()->lens()->setPerspectiveProjection(10.0f, 1.0f, 0.1f, 1000.0f);
-    this->camera()->setPosition(QVector3D(0, 70.0f, 0));
-    this->camera()->setViewCenter(QVector3D(0,0, 0));
-    this->camera()->setUpVector(QVector3D(0, 0, 1));
-   
-
-    //Contrôle de la caméra
-    this->cameraController = new Qt3DExtras::QOrbitCameraController(&this->scene);
-    this->cameraController->setLinearSpeed(10.0f);
-    this->cameraController->setLookSpeed(100.0f);
-    this->cameraController->setCamera(this->camera());
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    GLfloat x = (GLfloat)width / height;
+    glFrustum(-x, x, -1.0, 1.0, 15.0, 1000.0);
+    glMatrixMode(GL_MODELVIEW);
 }
+
+void My3DScene::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    draw();
+}
+
+void My3DScene::draw()
+{
+    static const GLfloat coords[6][4][3] =
+    {
+      { { +1.0, -1.0, +1.0 }, { +1.0, -1.0, -1.0 },
+      { +1.0, +1.0, -1.0 }, { +1.0, +1.0, +1.0 } },//face de droite
+      { { -1.0, -1.0, -1.0 }, { -1.0, -1.0, +1.0 },
+      { -1.0, +1.0, +1.0 }, { -1.0, +1.0, -1.0 } },//face de gauche
+      { { +1.0, -1.0, -1.0 }, { -1.0, -1.0, -1.0 },
+      { -1.0, +1.0, -1.0 }, { +1.0, +1.0, -1.0 } },//face avant
+      { { -1.0, -1.0, +1.0 }, { +1.0, -1.0, +1.0 },
+      { +1.0, +1.0, +1.0 }, { -1.0, +1.0, +1.0 } },//face arrière
+      { { -1.0, -1.0, -1.0 }, { +1.0, -1.0, -1.0 },
+      { +1.0, -1.0, +1.0 }, { -1.0, -1.0, +1.0 } },//face du bas
+      { { -1.0, +1.0, +1.0 }, { +1.0, +1.0, +1.0 },
+      { +1.0, +1.0, -1.0 }, { -1.0, +1.0, -1.0 } }///face du haut
+    };
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+
+    int c =colonne;
+    int l = ligne;
+
+    int k = 0;
+    //int k = (colonne * ligne) * 100;
+
+    
+    glTranslatef(0.0, 0.0, -600.0);
+    glRotatef(rotationX, 1.0, 0.0, 0.0);
+    glRotatef(rotationY, 0.0, 1.0, 0.0);
+    glRotatef(rotationZ, 0.0, 0.0, 1.0);
+    for (int z = 0; z < 207; z++) {
+
+        for (int y = 0; y < l; y++) {
+
+            for (int x = 0; x < c; x++)
+            {
+                GLint pixel = (*allpixels)[k];
+                if (pixel > 70) {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        glBegin(GL_QUADS);
+                        for (int j = 0; j < 4; j++)
+                        {
+                            glColor4b(pixel, pixel, pixel,100);
+                            glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2]+z);
+                        }
+                        glEnd();
+                    }
+                }
+                
+                
+                k++;
+
+
+            }
+        }
+    }
+
+}
+
+void My3DScene::mousePressEvent(QMouseEvent* event)
+{
+    lastPosition = event->pos();
+}
+
+void My3DScene::mouseMoveEvent(QMouseEvent* event)
+{
+    GLfloat dx = (GLfloat)(event->x() - lastPosition.x()) / width();
+    GLfloat dy = (GLfloat)(event->y() - lastPosition.y()) / height();
+    if (event->buttons() & Qt::LeftButton)
+    {
+        rotationX += 180 * dy;
+        rotationY += 180 * dx;
+        updateGL();
+    }
+    else if (event->buttons() & Qt::RightButton)
+    {
+        rotationX += 180 * dy;
+        rotationZ += 180 * dx;
+        updateGL();
+    }
+    lastPosition = event->pos();
+}
+
+//------------------------------------------------------------------------------
+//--- Constructors -------------------------------------------------------------
+//------------------------------------------------------------------------------
+My3DScene::My3DScene()
+{
+    init();
+    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+    this->rotationX = 0;
+    this->rotationY = 0;
+    this->rotationZ = 0;
+}
+
+
+
+
 
 /*--------------------------------------------------------------------------
 * Fonction : mouse3DMove()
@@ -464,7 +266,7 @@ void My3DScene::mouse3DMove()
         return;
 
     //Initialisation des transformations de la scène
-    this->SceneTransform = new Qt3DCore::QTransform();
+    //this->SceneTransform = new Qt3DCore::QTransform();
 
     //Passage des valeurs globales en locales
     int h = *compteurTX;
@@ -476,14 +278,14 @@ void My3DScene::mouse3DMove()
     
     if ((pTx > 5) || (pTx < -5) || (pTy > 5) || (pTy < -5) || (pTy > 5) || (pTy < -5) || (pRx > 5) || (pRx < -5) || (pRy > 5) || (pRy < -5) || (pRz > 5) || (pRz < -5)) {
         //Réinitialisation de la caméra
-        this->camera()->lens()->setPerspectiveProjection(10.0f, 1.0f, 0.1f, 1000.0f);
+        /*this->camera()->lens()->setPerspectiveProjection(10.0f, 1.0f, 0.1f, 1000.0f);
         this->camera()->setPosition(QVector3D(0, 70.0f, 0));
         this->camera()->setViewCenter(QVector3D(0,0, 0));
-        this->camera()->setUpVector(QVector3D(0, 0, 1));
+        this->camera()->setUpVector(QVector3D(0, 0, 1));*/
     }
 
     //Translation selon les veleurs de la souris pTx, pTy, pTz
-    this->SceneTransform->setTranslation(QVector3D((float)h/10.0, (float)l/2.0, (float)m / 10.0));
+    //this->SceneTransform->setTranslation(QVector3D((float)h/10.0, (float)l/2.0, (float)m / 10.0));
 
     //--------------------------TX-------------------------------
     //Conditions de sensibilité de la souris 3D
@@ -557,7 +359,7 @@ void My3DScene::mouse3DMove()
     //--------------------------RX-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((i > -360) && (i < 360)) {
-        this->SceneTransform->setRotationX(i);
+        //this->SceneTransform->setRotationX(i);
         
         //Conditions de sensibilité de la souris 3D
         if ((pRx > 5) && (pRx >= *precValueRX) && (pRx < 20)) {
@@ -591,7 +393,7 @@ void My3DScene::mouse3DMove()
     //--------------------------RY-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((j > -360) && (j < 360)) {
-        this->SceneTransform->setRotationY(j);
+        //this->SceneTransform->setRotationY(j);
         
         //Conditions de sensibilité de la souris 3D
         if ((-pRy > 5) && (-pRy >= *precValueRY) && (-pRy < 20)) {
@@ -626,7 +428,7 @@ void My3DScene::mouse3DMove()
     //--------------------------RZ-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((k > -360) && (k < 360)) {
-        this->SceneTransform->setRotationZ(k);
+        //this->SceneTransform->setRotationZ(k);
         //Conditions de sensibilité de la souris 3D
         if ((-pRz > 5) && (-pRz >= *precValueRZ) && (-pRz < 20)) {
             k = k - 1;
@@ -659,7 +461,7 @@ void My3DScene::mouse3DMove()
 
 
     //Ajout des composants à la scène
-    scene.addComponent(this->SceneTransform);
+    //scene.addComponent(this->SceneTransform);
     
 }
 
@@ -674,7 +476,7 @@ void My3DScene::mouse3DMove()
 *--------------------------------------------------------------------------*/
 void My3DScene::Recentrer()
 {
-    this->camera()->setViewCenter(QVector3D(0.0, 0.0, 0.0));//Position initiale
+    //this->camera()->setViewCenter(QVector3D(0.0, 0.0, 0.0));//Position initiale
     *compteurTX = 0;
     *compteurTY = 0;
     *compteurTZ = 0;
@@ -691,27 +493,9 @@ void My3DScene::Recentrer()
 *--------------------------------------------------------------------------*/
 void My3DScene::BloquerScene()
 {
-    this->camera()->setViewCenter(QVector3D(0.0, 0.0, 0.0));//Position initiale
+    //this->camera()->setViewCenter(QVector3D(0.0, 0.0, 0.0));//Position initiale
     *compteurTX = 0;
     *compteurTZ = 0;
 }
 
-/*--------------------------------------------------------------------------
-* Fonction : My3DScene()
-*
-* Description : Initialisation de la scène et de la souris et construction de la fenêtre
-*
-* Arguments : Aucun
-*
-* Valeur retournée : Aucune
-*--------------------------------------------------------------------------*/
-My3DScene::My3DScene()
-{
-    //Initialisation des variables globales
-    init();
 
-    //Construction de la scène
-    createObjects();
-    createCamera();
-    setRootEntity(&scene);
-}

@@ -223,9 +223,10 @@ Widget3D::Widget3D()
     Affichage->addAction("Recentrer", this, SLOT(centrage()));
 
     //Conversion de la Scene3d en QWidget et fixation de sa taille
-    container = createWindowContainer(Visualisation3D);
-    container->setFixedSize(999, 700);
-
+    QHBoxLayout* container = new QHBoxLayout;
+    container->addWidget(Visualisation3D);
+    QWidget* w = new QWidget;
+    w->setLayout(container);
     //Ajout des composants à leurs entités
     menu->addMenu(Fichier);
     menu->addMenu(Affichage);    
@@ -246,7 +247,7 @@ Widget3D::Widget3D()
         "border-radius: 0px;"
         "selection-background-color:rgb(30,30,30) ;");
     Layout->setMenuBar(menu);
-    Layout->addWidget(container, 1, 0, Qt::AlignBottom);
+    Layout->addWidget(w);
 
     //Appel des fonctions toutes les 10ms
     timer = new QTimer();

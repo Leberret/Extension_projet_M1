@@ -1,7 +1,7 @@
 #pragma once
 
 //Includes
-#include <QtWidgets/QMainWindow>
+#include <QtWidgets>
 #include "ui_DICOM_3Dmouse.h"
 #include <QApplication>
 #include <QtWidgets>
@@ -76,17 +76,12 @@ public slots:
 	void MajClicCoupe2(QMouseEvent* e);
 	void MajClicCoupe3(QMouseEvent* e);
 	void InfoCoupes();
-	void Enregistre();
+
 	void AIDE();
 	void fenetreActive();
 
 	//------------------Interface 3D-------------------------
-	void FirstImage(QString k);
-	void LastImage(QString k);
-	void AfficheIntensiteTransparence();
-	void SelectCoupes(int k);
-	void AppercuVisualisation3D();
-	void Supprimer();
+	void Affichage3D();
 
 private:
 	//------------------Interface 2D-------------------------
@@ -109,12 +104,12 @@ private:
 	QMenu* Info;
 	QMenu* Outils;
 	QStringList* Listechemin;
-	QVector<int>* allpixels;
+	//QVector<int>* allpixels;
 	QSpinBox* SpinBox1;
 	QSpinBox* SpinBox2;
 	QSpinBox* SpinBox3;
-	qint16* cols;
-	qint16* rows;
+	//qint16* cols;
+	//qint16* rows;
 	qint16* NbFichiers;
 	qint16* NbCouleurs;
 	qint16* IntensiteMaxInitCoupe1;
@@ -140,7 +135,7 @@ private:
 	qint16* Mode;
 	qint16* IntensiteOnOff;
 
-	//-----------------interface AppercuVisualisation3D--------------------------
+	//-----------------interface Affichage3D--------------------------
 	QWidget* WidgetAppercu3D;
 	QLabel* LabelVisuImage;
 	QLabel* LabelSaisieMin;
