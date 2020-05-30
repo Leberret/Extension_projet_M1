@@ -126,30 +126,14 @@ void My3DScene::init() {
 void My3DScene::initializeGL()
 {
     glClearColor(0, 0, 0, 1.0);
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
-}
 
-void My3DScene::resizeGL(int width, int height)
-{
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    GLfloat x = (GLfloat)width / height;
-    glFrustum(-x, x, -1.0, 1.0, 15.0, 1000.0);
-    glMatrixMode(GL_MODELVIEW);
-}
-
-void My3DScene::paintGL()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    draw();
-}
-
-void My3DScene::draw()
-{
+    // compile the display list, store a triangle in it
+    glNewList(1, GL_COMPILE);
+    
     static const GLfloat coords[6][4][3] =
     {
       { { +1.0, -1.0, +1.0 }, { +1.0, -1.0, -1.0 },
@@ -165,21 +149,11 @@ void My3DScene::draw()
       { { -1.0, +1.0, +1.0 }, { +1.0, +1.0, +1.0 },
       { +1.0, +1.0, -1.0 }, { -1.0, +1.0, -1.0 } }///face du haut
     };
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
 
-    int c =colonne;
+    int c = colonne;
     int l = ligne;
 
     int k = 0;
-    //int k = (colonne * ligne) * 100;
-
-    
-    glTranslatef(0.0, 0.0, -600.0);
-    glRotatef(rotationX, 1.0, 0.0, 0.0);
-    glRotatef(rotationY, 0.0, 1.0, 0.0);
-    glRotatef(rotationZ, 0.0, 0.0, 1.0);
     for (int z = 0; z < 207; z++) {
 
         for (int y = 0; y < l; y++) {
@@ -187,28 +161,51 @@ void My3DScene::draw()
             for (int x = 0; x < c; x++)
             {
                 GLint pixel = (*allpixels)[k];
-                if (pixel > 70) {
+                if (pixel > 50) {
                     for (int i = 0; i < 6; i++)
                     {
                         glBegin(GL_QUADS);
                         for (int j = 0; j < 4; j++)
                         {
-                            glColor4b(pixel, pixel, pixel,100);
-                            glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2]+z);
+                            glColor4b(pixel, pixel, pixel, 100);
+                            glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
                         }
                         glEnd();
                     }
                 }
-                
-                
                 k++;
-
-
             }
         }
     }
-
+    glEndList();
 }
+
+void My3DScene::resizeGL(int width, int height)
+{
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    GLfloat x = (GLfloat)width / height;
+    glFrustum(-x, x, -1.0, 1.0, 15.0, 3500.0);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void My3DScene::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    glTranslatef(0.0, 0.0, -3000.0);
+    glRotatef(rotationX, 1.0, 0.0, 0.0);
+    glRotatef(rotationY, 0.0, 1.0, 0.0);
+    glRotatef(rotationZ, 0.0, 0.0, 1.0);
+ 
+    glCallList(1);
+}
+
+
 
 void My3DScene::mousePressEvent(QMouseEvent* event)
 {

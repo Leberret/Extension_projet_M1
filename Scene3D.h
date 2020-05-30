@@ -58,7 +58,5 @@ public slots:
 
 public:
 	My3DScene();
-	
-	void draw();
 	void init();
 };
