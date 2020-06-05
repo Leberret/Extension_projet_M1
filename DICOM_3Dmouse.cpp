@@ -14,25 +14,47 @@ INT         Coupe, Min, Max;
 INT			mode3D;
 INT         ligne;
 INT         colonne;
-QVector<int>* allpixels;
-//qint16      *NbFichiers;
+QVector<vector<unsigned short>> *allpixels;
+qint16*      NbFichiers;
 
 /*--------------------------------------------------------------------------
 * Fonction : ALLPixels()
 *
 * Description : Stockages de tous les pixels de chaque image dans un seul vecteur
 *
-* Arguments : pixels : vecteur contenant la valeur de tous les pixels d'une image
-*             allpixels : vecteur contenant la valeur de tous les pixels de toutes images à la suite
+* Arguments : *pixels : vecteur contenant la valeur de tous les pixels d'une image
+*             *allpixels : vecteur contenant la valeur de tous les pixels de toutes images à la suite
 *
-* Valeur retournée : allpixels
+* Valeur retournée : *allpixels
 *--------------------------------------------------------------------------*/
-QVector<int>* ALLPixels(vector<unsigned short>* pixels, QVector<int>* allpixels)
+QVector<vector<unsigned short>>* ALLPixels(vector<unsigned short> *pixels, QVector<vector<unsigned short>> *allpixels)
 {
-    for (auto pixel2 : *pixels)
+    QMessageBox ErreurDossier;
+
+    int taille = colonne * ligne;
+    vector<vector<unsigned short>> pixels_color;
+
+    pixels_color.reserve(taille);
+    for (int k=0; k < taille; k++) {
+        //(pixels_color)[k] = { (*pixels)[k], (*pixels)[k], (*pixels)[k] };
+
+        pixels_color[k][0] = (*pixels)[k];
+        pixels_color[k][1] = (*pixels)[k];
+        pixels_color[k][2]= (*pixels)[k];
+
+    }
+    ErreurDossier.setWindowTitle("ATTENTION");
+    ErreurDossier.setWindowIcon(QIcon("icon.png"));
+    ErreurDossier.setIcon(QMessageBox::Warning);
+    ErreurDossier.setText("pb apres !!!");
+    ErreurDossier.exec();
+    
+    for (auto pixel2 : pixels_color)
         allpixels->push_back(pixel2); //Remplissage du vecteur avec les valeurs des pixels
+    
     return allpixels;
-}
+}    
+
 
 /*--------------------------------------------------------------------------
 * Fonction : Affichage3D()
@@ -80,7 +102,7 @@ void Interface::InfoCoupes()
     QByteArray b = pathFolderSave->toLocal8Bit(); //Convertir le QString* en const char * 
     const char* chemin = b.data();
     dcm::DicomFile* data;
-    vector<unsigned short>* pixels;
+    vector<unsigned short>* *pixels;
 
     //Lecture du fichier dcm
     data = readFile(chemin);
@@ -233,6 +255,8 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     pathFolder = new QString();
     *pathFolder = QFileDialog::getExistingDirectory(this, "Explorateur de fichiers");//Boite de dialogue sélection dossier
     
+
+
     //Condition d'existence du dossier
     if (pathFolder->isEmpty() || pathFolder->isNull())
         return;
@@ -273,7 +297,9 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     Listechemin = new QStringList();//Liste de QString
 
     //Initialisation du vecteur contenant tous les pixels
-    allpixels = new QVector<int>;
+    allpixels = new QVector<vector<unsigned short>>;
+
+
 
     //Stockage des chemins de fichier
     QDirIterator direction(*pathFolder, QDir::Files | QDir::NoSymLinks);// Obtenir l'arborescence des fichiers
@@ -299,14 +325,17 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
 
     //Récupération du nombre total de fichiers dans le dossier
     *NbFichiers = Listchemin.length();
-
+    
     //Création barre de chargement des images
     QProgressDialog* Chargement = new QProgressDialog("Importation des "+QString::number(*NbFichiers)+" images", "Cancel", 0, *NbFichiers,this);//Paramètres de la barre
     Chargement->setWindowTitle("Chargement");
     Chargement->setMinimumSize(400,50);
     Chargement->setWindowModality(Qt::WindowModal);
     Chargement->setCancelButton(0);//Impossible d'annuler
-    Chargement->setMinimumDuration(5);//Pas de temps mini de chargement
+    Chargement->setMinimumDuration(0);//Pas de temps mini de chargement
+
+
+
     //Gestion d'ouverture et de lecture de tous les fichiers du dossier
     for (int NbFichier = 0; NbFichier < *NbFichiers; NbFichier++)
     {
@@ -320,7 +349,7 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
         dcm::DicomFile* dataDcm;
 
         //Initialisation du vecteur contenant les pixels
-        vector<unsigned short>* pixels;
+        vector<unsigned short> *pixels;
 
         //Lecture du fichier
         dataDcm = readFile(chemin);//Lecture du fichier
@@ -345,10 +374,11 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
 
         pixels = readPixels(dataDcm); //Lecture des pixesls
         allpixels = ALLPixels(pixels, allpixels); //Tous les pixels stockés dans un vecteur
-        
+
         //Libération de la mémoire
         delete(dataDcm);
         delete(pixels);
+
     }
 
     //Hors de la boucle for, ajout de la valeur max pour fin de chargement
@@ -1411,10 +1441,17 @@ void Interface::GestionImages(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
+    vector<Mat> planes;
 
-    //Mise en local des dimensions de l'image recréée
+        //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
+
+    // Séparation des canaux d'une image.
+    split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
+	// Green et Red.
+
+
 
     //Initialisation de l'intensité max
     int valMax = 0;
@@ -1423,12 +1460,11 @@ void Interface::GestionImages(int NumeroImage)
     *IntensiteMaxInitCoupe1 = 0;
 
     //Navigation dans toute l'image prise en argument
-    int k = 0;
-    for (k = (colonne * ligne) * NumeroImage; k < (colonne * ligne) * (NumeroImage + 1); k++)
+    for (int k = (colonne * ligne) * NumeroImage; k < 3*(colonne * ligne) * (NumeroImage + 1); k+=3)
     {
         //Condition d'isolement de l'intensité max
-        if ((*allpixels)[k] > * IntensiteMaxInitCoupe1 && (*allpixels)[k] < 6000)
-            *IntensiteMaxInitCoupe1 = (*allpixels)[k];
+        if ((*allpixels)[k][0] > * IntensiteMaxInitCoupe1 && (*allpixels)[k][0] < 6000)
+            *IntensiteMaxInitCoupe1 = (*allpixels)[k][0];
     }
     //Init d'une QImage à ajouter a la fenetre Qt, dans laquelle ira la matrice
     QImage dest;
@@ -1440,22 +1476,29 @@ void Interface::GestionImages(int NumeroImage)
         valMax = *IntensiteVariableCoupe1;//Sinon modifié
 
     //Récupération de l'emplacement dans le vecteur global de la première valeur de l'image prise en argument 
-    k = (colonne * ligne) * NumeroImage;
+    int k = (colonne * ligne) * NumeroImage;
 
     //Reconstrution de l'image dans la matrice
-    for (int i = 0; i < l; i++)
+    for (int i = 0; i < l; i++) {
         for (int j = 0; j < c; j++)
         {
-            if (valMax==0) //On évite la division par 0
+            if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
-                image.at<unsigned char>(i, j) = (*allpixels)[k]; 
-
-            else //Normalisation de l'image sur une échelle 0-255
+                planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
+                planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
+                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];
+            }
+            else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
-                image.at<unsigned char>(i, j) = ((*allpixels)[k] * 255) / valMax; 
-
+                planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
+                planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
+                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;
+            }
             k++; //Décalage d'une valeur dans le vecteur global
         }
+    }
+    merge(planes, image);
+
     //QVector<QRgb>* pixel_jet;
     Mat result;
     Rect rectangle(0, 10, c-1 , l-10 );
@@ -1526,10 +1569,14 @@ void Interface::GestionImagesLignes(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     Mat image = Mat::zeros(*NbFichiers - 1, colonne, CV_8UC1);//Image de la taille obtenue avec data
+    vector<Mat> planes;    
     
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
+    // Séparation des canaux d'une image.
+    split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
+    // Green et Red.
 
     //Initialisation de l'intensité max
     int valMax = 0;//locale
@@ -1539,7 +1586,7 @@ void Interface::GestionImagesLignes(int NumeroImage)
     
     //Navigation dans toute l'image prise en argument
     int k = 0;
-    vector<int> Valeurdefinitif;
+    vector<vector<unsigned short>> Valeurdefinitif;
     for (int changementImag = 0; changementImag < (*allpixels).size(); changementImag += (colonne * ligne))
         for (int nb = changementImag + (NumeroImage * colonne - 1); nb < changementImag + ((NumeroImage + 1) * colonne - 1); nb++)//Condition pour avoir l'image selon la bonne coupe (tel ligne)
         {
@@ -1548,8 +1595,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     for (k = 0; k < Valeurdefinitif.size(); k++)
     {
         //Condition d'isolement de l'intensité max
-        if (Valeurdefinitif[k] > * IntensiteMaxInitCoupe2 && Valeurdefinitif[k] < 2500)
-            *IntensiteMaxInitCoupe2 = Valeurdefinitif[k];//Isolement de l'intensité max
+        if (Valeurdefinitif[k][0] > * IntensiteMaxInitCoupe2 && Valeurdefinitif[k][0] < 2500)
+            *IntensiteMaxInitCoupe2 = Valeurdefinitif[k][0];//Isolement de l'intensité max
     }
 
     //Init d'une QImage à ajouter a la fenetre Qt, dans laquelle ira la matrice
@@ -1564,18 +1611,25 @@ void Interface::GestionImagesLignes(int NumeroImage)
     k = 0;
 
     //Reconstrution de l'image dans la matrice
-    for (int i = 0; i < l; i++)
+    for (int i = 0; i < l; i++) {
         for (int j = 0; j < c; j++)
         {
-            if (valMax==0) //On évite la division par 0
+            if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
-                image.at<unsigned char>(i, j) = Valeurdefinitif[k];
-            else  //Normalisation de l'image sur une échelle 0-255
+                planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
+                planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
+                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];
+            }
+            else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
-                image.at<unsigned char>(i, j) = (Valeurdefinitif[k] * 255) / valMax;
-            k++;//Décalage d'une valeur dans le vecteur global
+                planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
+                planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
+                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;
+            }
+            k++; //Décalage d'une valeur dans le vecteur global
         }
-
+    }
+    merge(planes, image);
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
 
@@ -1724,9 +1778,14 @@ void Interface::GestionImagesColonnes(int v)
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     Mat image = Mat::zeros(*NbFichiers - 1, ligne, CV_8UC1);
 
+    vector<Mat> planes;
+
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
+    // Séparation des canaux d'une image.
+    split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
+    // Green et Red.
 
     //Initialisation de l'intensité max
     int valMax = 0;//Locale
@@ -1736,7 +1795,7 @@ void Interface::GestionImagesColonnes(int v)
     
     //Navigation dans toute l'image prise en argument
     int k = 0;
-    vector<int>Valeurdefinitif2; //Nouveau vecteur contenant les pixels de l'image
+    vector<vector<unsigned short>>Valeurdefinitif2; //Nouveau vecteur contenant les pixels de l'image
     for (int nb = v; nb < (*allpixels).size(); nb += colonne)//Condition pour avoir l'image selon la bonne coupe 
     {
         Valeurdefinitif2.push_back((*allpixels)[nb]);//Vecteur definitif avec valeurs de l'image a afficher (tel colonnes de chaque image)
@@ -1744,8 +1803,8 @@ void Interface::GestionImagesColonnes(int v)
     for (k = 0; k < Valeurdefinitif2.size(); k++) //Boucle pour avoir val max intensité
     {
         //Condition d'isolement de l'intensité max
-        if (Valeurdefinitif2[k] > * IntensiteMaxInitCoupe3 && Valeurdefinitif2[k] < 2500)
-            *IntensiteMaxInitCoupe3 = Valeurdefinitif2[k];
+        if (Valeurdefinitif2[k][0] > * IntensiteMaxInitCoupe3 && Valeurdefinitif2[k][0] < 2500)
+            *IntensiteMaxInitCoupe3 = Valeurdefinitif2[k][0];
     }
 
     //Init d'une QImage à ajouter a la fenetre Qt, dans laquelle ira la matrice
@@ -1760,20 +1819,26 @@ void Interface::GestionImagesColonnes(int v)
     k = 0;
 
     //Reconstrution de l'image dans la matrice
-    for (int i = 0; i < l; i++)
+    for (int i = 0; i < l; i++) {
         for (int j = 0; j < c; j++)
         {
-            if (valMax == 0)//On évite la division par 0
+            if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
-                image.at<unsigned char>(i, j) = Valeurdefinitif2[k];
-
-            else //Normalisation de l'image sur une échelle 0-255
+                planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
+                planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
+                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];
+            }
+            else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
-                image.at<unsigned char>(i, j) = (Valeurdefinitif2[k] * 255) / valMax;
-
+                planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
+                planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
+                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;
+            }
             k++; //Décalage d'une valeur dans le vecteur global
         }
-    
+    }
+    merge(planes, image);
+
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
 
