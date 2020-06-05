@@ -128,8 +128,20 @@ void My3DScene::initializeGL()
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
     glEnable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
+
+
+    //Création barre de chargement des images
+    /*QProgressDialog Chargement= new QProgressDialog("Reconstruction 3D", "Cancel", 0, *NbFichiers, this);//Paramètres de la barre
+    Chargement.setWindowTitle("Chargement");
+    Chargement.setMinimumSize(400, 50);
+    Chargement.setWindowModality(Qt::WindowModal);
+    Chargement.setCancelButton(0);//Impossible d'annuler
+    Chargement.setMinimumDuration(5);//Pas de temps mini de chargement*/
 
     // compile the display list, store a triangle in it
     glNewList(1, GL_COMPILE);
@@ -151,46 +163,54 @@ void My3DScene::initializeGL()
     };
 
 
-    int k = 0;
-    for (int z = 0; z < 206; z++) {
+    int k = 0*colonne*ligne;
+    for (int z = 0; z < *NbFichiers; z++) {
 
         for (int y = 0; y < ligne; y++) {
 
             for (int x = 0; x < colonne; x++)
             {
-                GLint pixel = (*allpixels)[k];
-                if(pixel>40){
-                    if ((k < colonne * ligne * 1) || (k > colonne * ligne * 205)) {
-                        for (int i = 0; i < 6; i++)
-                        {
-                            glBegin(GL_QUADS);
-                            for (int j = 0; j < 4; j++)
+                vector<unsigned short> pixel = (*allpixels)[k];
+                if((pixel[0]==pixel[1])&&(pixel[0]==pixel[2])){ //si noir et blanc
+                    if ((pixel[0] > 40)) {
+                        if ((k < colonne * ligne * 1) || (k > colonne * ligne * (*NbFichiers - 1))) {
+                            for (int i = 0; i < 6; i++)
                             {
-                                glColor3b(pixel, pixel, pixel);
-                                glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
+                                glBegin(GL_QUADS);
+                                for (int j = 0; j < 4; j++)
+                                {
+                                    glColor4b(pixel[0],0,0,100);//pixel[1], pixel[2], 100);
+                                    glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
+                                }
+                                glEnd();
                             }
-                            glEnd();
                         }
                     }
-                    else if (((*allpixels)[k + 1] < 40) || ((*allpixels)[k - 1] < 40) || ((*allpixels)[k + colonne] < 40) || ((*allpixels)[k - colonne] < 40) || ((*allpixels)[k + ligne * colonne] < 40) || ((*allpixels)[k - ligne * colonne] < 40)) {
+                    else if (((*allpixels)[k + 1][0] < 40) || ((*allpixels)[k - 1][0] < 40) || ((*allpixels)[k + colonne][0] < 40) || ((*allpixels)[k - colonne][0] < 40) || ((*allpixels)[k + ligne * colonne][0] < 40) || ((*allpixels)[k - ligne * colonne][0] < 40)) {
                         for (int i = 0; i < 6; i++)
                         {
                             glBegin(GL_QUADS);
                             for (int j = 0; j < 4; j++)
                             {
-                                glColor3b(pixel, pixel, pixel);
+                                glColor4b(pixel[0], 0, 0, 10);//pixel[1], pixel[2], 100);
+
+                                //glColor4b(pixel[0], pixel[1], pixel[2], 10);
                                 glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
                             }
                             glEnd();
                         }
-                        
                     }
                 }
                 
                 k++;
             }
         }
+        //Chargement->setValue(z);
+
     }
+    //Hors de la boucle for, ajout de la valeur max pour fin de chargement
+    //Chargement->setValue(*NbFichiers);
+    //delete Chargement;
     glEndList();
 }
 

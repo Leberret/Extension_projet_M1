@@ -7,7 +7,6 @@
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QPoint>
-
 // Namespaces.
 using namespace std;
 
@@ -16,8 +15,8 @@ using namespace std;
 extern INT			pTx, pTy, pTz, pRx, pRy, pRz;
 extern INT			colonne;
 extern INT			ligne;
-//extern qint16		NbFichiers;
-extern QVector<int>* allpixels;
+extern qint16*		NbFichiers;
+extern QVector<vector<unsigned short>>* allpixels;
 
 
 
