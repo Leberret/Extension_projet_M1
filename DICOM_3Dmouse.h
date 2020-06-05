@@ -106,12 +106,13 @@ private:
 	QMenu* Outils;
 	QStringList* Listechemin;
 	//QVector<int>* allpixels;
+	vector<vector<unsigned short>>* pixels_color;
 	QSpinBox* SpinBox1;
 	QSpinBox* SpinBox2;
 	QSpinBox* SpinBox3;
 	//qint16* cols;
 	//qint16* rows;
-	qint16* NbFichiers;
+	//qint16* NbFichiers;
 	qint16* NbCouleurs;
 	qint16* IntensiteMaxInitCoupe1;
 	qint16* IntensiteVariableCoupe1;

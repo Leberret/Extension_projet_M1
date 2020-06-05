@@ -105,7 +105,7 @@ vector<unsigned short>* readPixels(dcm::DicomFile* data)
   const dcm::DataElement* pixelsElement;
   
   pixelsElement = data->Get(0x7fe00010);
-  pixels = new vector<unsigned short>(pixelsElement->length()/2);
+  pixels = new vector<unsigned short>(pixelsElement->length() / 2);
   for (auto i = 0; i < pixelsElement->length(); i+=2)
   {
     unsigned char part1 = pixelsElement->buffer()[i];
@@ -130,7 +130,7 @@ dcm::DicomFile* readFile(const char* filePath)
 }
 
 
-void displayPixels(vector<unsigned short>* pixels)
+void displayPixels(vector<unsigned short> *pixels)
 {
   for (auto pixel: *pixels)
     cout << pixel << " ";

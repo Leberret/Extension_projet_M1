@@ -262,7 +262,7 @@ Widget3D::Widget3D()
     //paramètres du widget
     setLayout(Layout);
     setStyleSheet("background-color:white;");
-    setFixedSize(1000, 800);
+    //setFixedSize(1000, 800);
     setWindowIcon(QIcon("icon.png"));
     setWindowTitle("Interface de reconstruction 3D des IRM");//titre fenetre
 
