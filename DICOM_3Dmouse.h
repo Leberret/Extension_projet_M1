@@ -50,6 +50,7 @@ public slots:
 	void DoubleClics();
 	void ClicGauche();
 	void SaveAs();
+	void Detourage();
 	void UtiliserSouris3D();
 	void AffichageOriginal();
 	void AffichageJet();

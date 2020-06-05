@@ -15,6 +15,7 @@ INT			mode3D;
 INT         ligne;
 INT         colonne;
 QVector<int>* allpixels;
+//qint16      *NbFichiers;
 
 /*--------------------------------------------------------------------------
 * Fonction : ALLPixels()
@@ -156,7 +157,7 @@ void Interface::displayTags()
 
     //Initialisation des variables gloables
     QString nom, genre, Date, type, photo, Datetude;
-
+    QString roi;
     //Gestion de l'ouverture d'un fichier dcm
     QByteArray b = pathFolderSave->toLocal8Bit(); //Convertir le QString* en const char *
     const char* chemin = b.data();
@@ -197,13 +198,20 @@ void Interface::displayTags()
     //Supression du ^ entre le nom et le prénom
     nom.replace("^", " ");
 
+    string Roi;
+    if (data.GetString(dcm::tags::kROIContourSequence, &Roi))
+        roi= QString::fromStdString(Roi);
+
+
+
     //Affichage des infomations (avec date en norme française)
     msg.setText("Nom du patient : " + nom + "\n" +
         "Sexe : " + genre + "\n" +
         "Date de naissance : " + Date[6] + Date[7] + "/" + Date[4] + Date[5] + "/" + Date[0] + Date[1] + Date[2] + Date[3] + "\n" +
         "Date de l'etude : " + Datetude[6] + Datetude[7] + "/" + Datetude[4] + Datetude[5] + "/" + Datetude[0] + Datetude[1] + Datetude[2] + Datetude[3] + "\n" +
         "Type d'images : " + type + "\n" +
-        "Interpretation photometrique : " + photo + "\n"); //Ajout à la boite QMessageBox
+        "Interpretation photometrique : " + photo + "\n"+
+        "ROI : "+roi+"\n"); //Ajout à la boite QMessageBox
     msg.setWindowTitle("Informations patient");
     msg.setWindowIcon(QIcon("icon.png"));
 
@@ -337,7 +345,7 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
 
         pixels = readPixels(dataDcm); //Lecture des pixesls
         allpixels = ALLPixels(pixels, allpixels); //Tous les pixels stockés dans un vecteur
-
+        
         //Libération de la mémoire
         delete(dataDcm);
         delete(pixels);
@@ -346,7 +354,9 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     //Hors de la boucle for, ajout de la valeur max pour fin de chargement
     Chargement->setValue(*NbFichiers);
     delete Chargement;
-            
+    
+
+
     //-----------------------Paramétrage et positionnement des outils------------------------
     SpinBox1->setButtonSymbols(QSpinBox::NoButtons);
     SpinBox2->setButtonSymbols(QSpinBox::NoButtons);
@@ -1375,6 +1385,17 @@ void Interface::SaveAs() {
 
 }
 
+
+void Interface::Detourage() {
+    //Création d'un image vide de la taille obtenue dans OuvrirFichier
+    Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
+
+    //Mise en local des dimensions de l'image recréée
+    int l = image.rows;
+    int c = image.cols;
+
+}
+
 /*--------------------------------------------------------------------------
 * Fonctions : GestionImages(), GestionImagesLignes(), GestionImagesColonnes()
 *
@@ -1435,7 +1456,12 @@ void Interface::GestionImages(int NumeroImage)
 
             k++; //Décalage d'une valeur dans le vecteur global
         }
-
+    //QVector<QRgb>* pixel_jet;
+    Mat result;
+    Rect rectangle(0, 10, c-1 , l-10 );
+    Mat bgdModel, fgdModel; // the models (internally used)
+    // Generate output image
+    Mat foreground(image.size(), CV_8UC3, Scalar(0, 0, 255));
     //Application de la couleur et convertion en format adapté
     switch (*NbCouleurs)
     {
@@ -1444,7 +1470,14 @@ void Interface::GestionImages(int NumeroImage)
         break;
     case 1:
         applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        
+        grabCut(image, result, rectangle, bgdModel, fgdModel, 1, GC_INIT_WITH_RECT);
+        compare(result, GC_PR_FGD, result, CMP_EQ);
+
+
+        image.copyTo(foreground, result); // bg pixels not copied
+            
+        dest = QImage((uchar*)foreground.data, foreground.cols, foreground.rows, foreground.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 2:
         applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
@@ -1479,92 +1512,6 @@ void Interface::GestionImages(int NumeroImage)
         c = 1.75 * c;//Coeff de 1.75
     }
 
-    //Transformation et enregistrement des images au format .png
-    if (*Mode == 1 && *NbCouleurs == 0)
-    {
-        //Création d'une matrice vide
-        Mat input_bgra;
-
-        //Copie et conversion de l'image en niveau de gris vers BGRA
-        cvtColor(image, input_bgra, COLOR_GRAY2BGRA);
-
-        //Navigation dans toute l'image prise en argument
-        for (int y = 0; y < input_bgra.rows; ++y)
-            for (int x = 0; x < input_bgra.cols; ++x)
-            {
-                //Création d'un vecteur contenant les 4 composantes du pixel
-                cv::Vec4b& pixel = input_bgra.at<cv::Vec4b>(y, x);
-
-                //Si la valeur du pixel < à l'intensité choisi par l'utilisateur
-                if (image.at<unsigned char>(y, x) < SliderVisuTransparence->value())
-                {
-                    // Mise à 0 de alpha pour rendre transparent
-                    pixel[3] = 0;
-                }
-
-                //Si la valeur du pixel > à l'intensité choisi par l'utilisateur
-                else {
-                    //Diminution de l'intensité pour éviter d'avoir une image trop transparente
-                    pixel[0] -= SliderVisuIntensite->value();
-                    pixel[1] -= SliderVisuIntensite->value();
-                    pixel[2] -= SliderVisuIntensite->value();
-
-                    pixel[3] = 1; //Rendre visible le pixel
-                }
-            }
-
-        //Enregistrement au format png en fonction du numéro de l'image
-        string cheminimage;
-        string format = ".PNG";
-        string numero = to_string(NumeroImage);
-        cheminimage = "Images/Coupe1_" + numero + format;
-        imwrite(cheminimage, input_bgra);
-
-    }
-
-    //Transformation et aperçu d'une image
-    if (*Mode == 3 && *NbCouleurs == 0 && *CoupeVisu == 0)
-    {
-        //Création d'une matrice vide
-        Mat input_bgra;
-
-        //Copie et conversion de l'image en niveau de gris vers BGRA
-        cvtColor(image, input_bgra, COLOR_GRAY2BGRA);
-
-        //Navigation dans toute l'image prise en argument
-        for (int y = 0; y < input_bgra.rows; ++y)
-            for (int x = 0; x < input_bgra.cols; ++x)
-            {
-                //Création d'un vecteur contenant les 4 composantes du pixel
-                cv::Vec4b& pixel = input_bgra.at<cv::Vec4b>(y, x);
-
-                //Si la valeur du pixel < à l'intensité choisi par l'utilisateur
-                if (image.at<unsigned char>(y, x) < SliderVisuTransparence->value())
-                {
-                    //Mise en blanc de ce qui sera transparent lors de l'enregistrement
-                    pixel[0] = 255;
-                    pixel[1] = 255;
-                    pixel[2] = 255;
-
-                    // Mise à 1 de alpha pour rendre visible
-                    pixel[3] = 1;
-                }
-                else {
-                    //Diminution de l'intensité pour éviter d'avoir une image trop transparente
-                    pixel[0] -= SliderVisuIntensite->value();
-                    pixel[1] -= SliderVisuIntensite->value();
-                    pixel[2] -= SliderVisuIntensite->value();
-
-                    // Mise à 1 de alpha pour rendre visible
-                    pixel[3] = 1;
-                }
-            }
-
-        //Convesion et affichage de l'image dans la fenêtre visualisation 3D
-        QImage visu = QImage((uchar*)input_bgra.data, input_bgra.cols, input_bgra.rows, input_bgra.step, QImage::Format_RGBX8888); //Conversion d'un MAT en QImage
-        LabelVisuImage->setPixmap(QPixmap::fromImage(visu).scaled(QSize(c, l), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        LayoutVisuImage->addWidget(LabelVisuImage, 0, 0, 1, 3, Qt::AlignHCenter);//Ajout du layout à l'image
-    }
 
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
@@ -1708,13 +1655,13 @@ void Interface::GestionImagesLignes(int NumeroImage)
                     pixel[3] = 1; //Rendre visible le pixel
                 }
             }
-
+        /*
         //Enregistrement au format png en fonction du numéro de l'image
         string cheminimage;
         string format = ".PNG";
         string numero = to_string(NumeroImage);
         cheminimage = "Images/Coupe2_" + numero + format;
-        imwrite(cheminimage, input_bgra);
+        imwrite(cheminimage, input_bgra);*/
     }
 
     //Transformation et aperçu d'une image
@@ -1906,13 +1853,13 @@ void Interface::GestionImagesColonnes(int v)
                     pixel[3] = 1; //Rendre visible le pixel
                 }
             }
-        
+        /*
         //Enregistrement au format png en fonction du numéro de l'image
         string cheminimage;
         string format = ".PNG";
         string numero = to_string(v);
         cheminimage = "Images/Coupe3_" + numero + format;
-        imwrite(cheminimage, input_bgra);
+        imwrite(cheminimage, input_bgra);*/
     }
     
     //Transformation et aperçu d'une image
