@@ -9,8 +9,7 @@
 #include "DICOM_3Dmouse.h"
 #include "Widget3D.h"
 
-//Appel des variables globales externes
-extern int Coupe, Min, Max;
+
 
 /*--------------------------------------------------------------------------
 * Fonction : init()
@@ -128,6 +127,7 @@ void My3DScene::initializeGL()
     glClearColor(0, 0, 0, 1.0);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
 
@@ -150,29 +150,43 @@ void My3DScene::initializeGL()
       { +1.0, +1.0, -1.0 }, { -1.0, +1.0, -1.0 } }///face du haut
     };
 
-    int c = colonne;
-    int l = ligne;
 
     int k = 0;
-    for (int z = 0; z < 207; z++) {
+    for (int z = 0; z < 206; z++) {
 
-        for (int y = 0; y < l; y++) {
+        for (int y = 0; y < ligne; y++) {
 
-            for (int x = 0; x < c; x++)
+            for (int x = 0; x < colonne; x++)
             {
                 GLint pixel = (*allpixels)[k];
-                if (pixel > 50) {
-                    for (int i = 0; i < 6; i++)
-                    {
-                        glBegin(GL_QUADS);
-                        for (int j = 0; j < 4; j++)
+                if(pixel>40){
+                    if ((k < colonne * ligne * 1) || (k > colonne * ligne * 205)) {
+                        for (int i = 0; i < 6; i++)
                         {
-                            glColor4b(pixel, pixel, pixel, 100);
-                            glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
+                            glBegin(GL_QUADS);
+                            for (int j = 0; j < 4; j++)
+                            {
+                                glColor3b(pixel, pixel, pixel);
+                                glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
+                            }
+                            glEnd();
                         }
-                        glEnd();
+                    }
+                    else if (((*allpixels)[k + 1] < 40) || ((*allpixels)[k - 1] < 40) || ((*allpixels)[k + colonne] < 40) || ((*allpixels)[k - colonne] < 40) || ((*allpixels)[k + ligne * colonne] < 40) || ((*allpixels)[k - ligne * colonne] < 40)) {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            glBegin(GL_QUADS);
+                            for (int j = 0; j < 4; j++)
+                            {
+                                glColor3b(pixel, pixel, pixel);
+                                glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
+                            }
+                            glEnd();
+                        }
+                        
                     }
                 }
+                
                 k++;
             }
         }

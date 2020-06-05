@@ -1,26 +1,27 @@
 #pragma once
 
 // Includes
+#include "glut.h"
 #include <iostream>
-#include <QGuiApplication>
-
+#include <QApplication>
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QPoint>
-#include "glut.h"
+
 // Namespaces.
 using namespace std;
 
 //Variables globales externes
-extern INT			Coupe, Min, Max;
+//extern INT			Coupe, Min, Max;
 extern INT			pTx, pTy, pTz, pRx, pRy, pRz;
 extern INT			colonne;
 extern INT			ligne;
+//extern qint16		NbFichiers;
 extern QVector<int>* allpixels;
 
 
 
-//Class My3DScene.
+//Class My3DScene
 class My3DScene : public QGLWidget
 {
 private:
