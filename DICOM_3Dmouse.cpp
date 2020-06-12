@@ -16,10 +16,9 @@ INT         ligne;
 INT         colonne;
 qint16*     NbFichiers;
 qint16*     NbCouleurs;
-//QVector<unsigned short>* allpixels;
+QVector<unsigned short>* allpixels;
 FLOAT       EcartCoupe;
 FLOAT       EcartPixel;
-QVector<Vec3b>* ImgVec;
 
 //QVector<Vec3b>* ImgVec;
 /*--------------------------------------------------------------------------
@@ -62,78 +61,6 @@ QVector<unsigned short>* Interface::ALLPixelsFunc(vector<unsigned short>* pixels
     for (auto pixel : *pixels)
         allpixels->push_back(pixel); //Remplissage du vecteur avec les valeurs des pixels
     return allpixels;
-}
-
-
-QVector<Vec3b>* Interface::VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec) {
-
-    QProgressDialog* Chargement2 = new QProgressDialog("Preparation a la reconstruction 3D", "Cancel", 0, *NbFichiers, this);//Paramètres de la barre
-    Chargement2->setWindowTitle("Chargement");
-    Chargement2->setMinimumSize(400, 50);
-    Chargement2->setWindowModality(Qt::WindowModal);
-    Chargement2->setCancelButton(0);//Impossible d'annuler
-    Chargement2->setMinimumDuration(0);//Pas de temps mini de chargement
-
-    int k = 0;
-    for (int z = 0; z < *NbFichiers; z++) {
-        Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
-        for (int y = 0; y < ligne; y++)
-        {
-            for (int x = 0; x < colonne; x++)
-            {
-                // get pixel 
-                image.at<uchar>(y, x) = (*all)[k];
-                k++;
-            }
-        }
-        //Ajout valeur barre de chargement
-        Chargement2->setValue(z);
-        //Mat image;// = Mat::zeros(ligne, colonne, CV_16UC3);
-
-        cvtColor(image, image, COLOR_GRAY2BGR);
-
-        //Application de la couleur et convertion en format adapté
-        /*switch (*NbCouleurs)
-        {
-        case 0:
-            cvtColor(image, image, COLOR_GRAY2BGR);
-            break;
-        case 1:
-            applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
-            break;
-        case 2:
-            applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
-            break;
-        case 3:
-            applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
-            break;
-        case 4:
-            applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
-            break;
-        case 5:
-            applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
-            break;
-        case 6:
-            applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
-            break;
-        case 7:
-            applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
-            break;
-        }*/
-
-        //QVector<Vec3b> pixels;
-
-        MatIterator_<Vec3b> it, end;
-        for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it)
-        {
-            ImgVec->push_back(*it);
-        }
-
-    }
-    Chargement2->setValue(*NbFichiers);
-    delete Chargement2;
-
-    return ImgVec;
 }
 
 /*QVector<Vec3b>* Interface::VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec, int NbFichier) {
@@ -436,7 +363,7 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     //Initialisation du vecteur contenant tous les pixels
     //allpixels = new QVector < QVector<Vec3b>>;
     allpixels = new QVector < unsigned short>;
-    ImgVec = new QVector<Vec3b>;
+    //ImgVec = new QVector<Vec3b>;
 
 
     //Stockage des chemins de fichier
@@ -581,13 +508,11 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     delete Chargement;
     
     EcartCoupe = fabs(PositionsVector[1]- PositionsVector[0]);
-    /*int arrondie = round(EcartCoupe);
+    int arrondie = round(EcartCoupe);
     QString affiche = QString::number(arrondie);
     QMessageBox msg;
     msg.setText(affiche);
-    msg.exec();*/
-
-    ImgVec = VectorImages(allpixels, ImgVec);
+    msg.exec();
 
     //-----------------------Paramétrage et positionnement des outils------------------------
     SpinBox1->setButtonSymbols(QSpinBox::NoButtons);
@@ -1822,10 +1747,18 @@ void Interface::GestionImagesLignes(int NumeroImage)
             if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
                 image.at<unsigned char>(i, j) = Valeurdefinitif[k];
+
+                /*planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
+                planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
+                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];*/
             }
             else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
                 image.at<unsigned char>(i, j) = (Valeurdefinitif[k] * 255) / valMax;
+
+                /*planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
+                planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
+                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;*/
             }
             k++; //Décalage d'une valeur dans le vecteur global
         }

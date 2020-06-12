@@ -207,7 +207,7 @@ void My3DScene::initializeGL()
       { { -1.0, +f, +1.0 }, { +1.0, +f, +1.0 },
       { +1.0, +f, -1.0 }, { -1.0, +f, -1.0 } }///face du haut
     };*/
-    QVector<Vec3b>* imgs = ImgVec;//VectorImages(allpixels);
+    QVector<Vec3b>* imgs = VectorImages(allpixels);
     
     int k = 0*colonne*ligne;
     for (int z = 0; z < *NbFichiers; z++) {
@@ -313,7 +313,67 @@ void My3DScene::mouseMoveEvent(QMouseEvent* event)
 }
 
 
+QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
 
+    //Création d'un image vide de la taille obtenue dans OuvrirFichier
+    ImgVec=new QVector<Vec3b>;
+    int k=0;
+    for (int z = 0; z < *NbFichiers; z++) {
+        Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
+        for (int y = 0; y < ligne; y++)
+        {
+            for (int x = 0; x < colonne; x++)
+            {
+                // get pixel 
+                image.at<uchar>(y, x) = (*all)[k];
+                k++;
+            }
+        }
+        //Mat image;// = Mat::zeros(ligne, colonne, CV_16UC3);
+
+
+        //Application de la couleur et convertion en format adapté
+        switch (*NbCouleurs)
+        {
+        case 0:
+            cvtColor(image, image, COLOR_GRAY2BGR);
+            break;
+        case 1:
+            applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
+            break;
+        case 2:
+            applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
+            break;
+        case 3:
+            applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
+            break;
+        case 4:
+            applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
+            break;
+        case 5:
+            applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
+            break;
+        case 6:
+            applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
+            break;
+        case 7:
+            applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
+            break;
+        }
+
+        //QVector<Vec3b> pixels;
+
+        MatIterator_<Vec3b> it, end;
+        for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it)
+        {
+            ImgVec->push_back(*it);
+        }
+
+    }
+
+
+    return ImgVec;
+}
 
 
 //------------------------------------------------------------------------------
