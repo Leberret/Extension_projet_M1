@@ -146,7 +146,8 @@ void My3DScene::initializeGL()
     // compile the display list, store a triangle in it
     glNewList(1, GL_COMPILE);
     
-    static const GLfloat coords[6][4][3] =
+    float f = round(EcartCoupe*(1/EcartPixel));
+    /*static const GLfloat coords[6][4][3] =
     {
       { { +1.0, -1.0, +1.0 }, { +1.0, -1.0, -1.0 },
       { +1.0, +1.0, -1.0 }, { +1.0, +1.0, +1.0 } },//face de droite
@@ -160,9 +161,54 @@ void My3DScene::initializeGL()
       { +1.0, -1.0, +1.0 }, { -1.0, -1.0, +1.0 } },//face du bas
       { { -1.0, +1.0, +1.0 }, { +1.0, +1.0, +1.0 },
       { +1.0, +1.0, -1.0 }, { -1.0, +1.0, -1.0 } }///face du haut
+    };*/
+    static const GLfloat coords[6][4][3] =
+    {
+      { { +1.0, -1.0, +f }, { +1.0, -1.0, -f },
+      { +1.0, +1.0, -f }, { +1.0, +1.0, +f } },//face de droite
+      { { -1.0, -1.0, -f }, { -1.0, -1.0, +f },
+      { -1.0, +1.0, +f }, { -1.0, +1.0, -f } },//face de gauche
+      { { +1.0, -1.0, -f }, { -1.0, -1.0, -f },
+      { -1.0, +1.0, -f }, { +1.0, +1.0, -f } },//face avant
+      { { -1.0, -1.0, +f }, { +1.0, -1.0, +f },
+      { +1.0, +1.0, +f }, { -1.0, +1.0, +f } },//face arrière
+      { { -1.0, -1.0, -f }, { +1.0, -1.0, -f },
+      { +1.0, -1.0, +f }, { -1.0, -1.0, +f } },//face du bas
+      { { -1.0, +1.0, +f }, { +1.0, +1.0, +f },
+      { +1.0, +1.0, -f }, { -1.0, +1.0, -f } }///face du haut
     };
-
-
+    /*static const GLfloat coords[6][4][3] =
+    {
+      { { +f, -1.0, +1.0 }, { +f, -1.0, -1.0 },
+      { +f, +1.0, -1.0 }, { +f, +1.0, +1.0 } },//face de droite
+      { { -f, -1.0, -1.0 }, { -f, -1.0, +1.0 },
+      { -f, +1.0, +1.0 }, { -f, +1.0, -1.0 } },//face de gauche
+      { { +f, -1.0, -1.0 }, { -f, -1.0, -1.0 },
+      { -f, +1.0, -1.0 }, { +f, +1.0, -1.0 } },//face avant
+      { { -f, -1.0, +1.0 }, { +f, -1.0, +1.0 },
+      { +f, +1.0, +1.0 }, { -f, +1.0, +1.0 } },//face arrière
+      { { -f, -1.0, -1.0 }, { +f, -1.0, -1.0 },
+      { +f, -1.0, +1.0 }, { -f, -1.0, +1.0 } },//face du bas
+      { { -f, +1.0, +1.0 }, { +f, +1.0, +1.0 },
+      { +f, +1.0, -1.0 }, { -f, +1.0, -1.0 } }///face du haut
+    };*/
+    /*static const GLfloat coords[6][4][3] =
+    {
+      { { +1.0, -f, +1.0 }, { +1.0, -f, -1.0 },
+      { +1.0, +f, -1.0 }, { +1.0, +f, +1.0 } },//face de droite
+      { { -1.0, -f, -1.0 }, { -1.0, -f, +1.0 },
+      { -1.0, +f, +1.0 }, { -1.0, +f, -1.0 } },//face de gauche
+      { { +1.0, -f, -1.0 }, { -1.0, -f, -1.0 },
+      { -1.0, +f, -1.0 }, { +1.0, +f, -1.0 } },//face avant
+      { { -1.0, -f, +1.0 }, { +1.0, -f, +1.0 },
+      { +1.0, +f, +1.0 }, { -1.0, +f, +1.0 } },//face arrière
+      { { -1.0, -f, -1.0 }, { +1.0, -f, -1.0 },
+      { +1.0, -f, +1.0 }, { -1.0, -f, +1.0 } },//face du bas
+      { { -1.0, +f, +1.0 }, { +1.0, +f, +1.0 },
+      { +1.0, +f, -1.0 }, { -1.0, +f, -1.0 } }///face du haut
+    };*/
+    QVector<Vec3b>* imgs = VectorImages(allpixels);
+    
     int k = 0*colonne*ligne;
     for (int z = 0; z < *NbFichiers; z++) {
 
@@ -170,43 +216,44 @@ void My3DScene::initializeGL()
 
             for (int x = 0; x < colonne; x++)
             {
-                vector<unsigned short> pixel = (*allpixels)[k];
-                if((pixel[0]==pixel[1])&&(pixel[0]==pixel[2])){ //si noir et blanc
-                    if ((pixel[0] > 40)) {
+                Vec3b pixel = (*imgs)[k];
+                //if((pixel[0]==pixel[1])&&(pixel[0]==pixel[2])){ //si noir et blanc
+                    if ((pixel[0] > 40) || (pixel[1] > 40) || (pixel[2] > 40)) {
                         if ((k < colonne * ligne * 1) || (k > colonne * ligne * (*NbFichiers - 1))) {
                             for (int i = 0; i < 6; i++)
                             {
                                 glBegin(GL_QUADS);
                                 for (int j = 0; j < 4; j++)
                                 {
-                                    glColor4b(pixel[0],0,0,100);//pixel[1], pixel[2], 100);
-                                    glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
+                                    glColor4b(pixel[2], pixel[1], pixel[0], 100);
+                                    glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + f*z);
+                                }
+                                glEnd();
+                            }
+                        }
+
+                        else if ((((*imgs)[k + 1][0] < 40)&&((*imgs)[k + 1][1] < 40)&&((*imgs)[k + 1][2] < 40)) || (((*imgs)[k - 1][0] < 40)&& ((*imgs)[k - 1][1] < 40)&& ((*imgs)[k - 1][2] < 40)) || (((*imgs)[k + colonne][0] < 40)&&((*imgs)[k + colonne][1] < 40)&& ((*imgs)[k + colonne][2] < 40)) || (((*imgs)[k - colonne][0] < 40)&& ((*imgs)[k - colonne][1] < 40)&& ((*imgs)[k - colonne][2] < 40)) || (((*imgs)[k + ligne * colonne][0] < 40)&& ((*imgs)[k + ligne * colonne][1] < 40)&& ((*imgs)[k + ligne * colonne][2] < 40)) || (((*imgs)[k - ligne * colonne][0] < 40)&& ((*imgs)[k - ligne * colonne][1] < 40)&& ((*imgs)[k - ligne * colonne][2] < 40))) {
+                            for (int i = 0; i < 6; i++)
+                            {
+                                glBegin(GL_QUADS);
+                                for (int j = 0; j < 4; j++)
+                                {
+                                    //glColor4b(pixel[0], pixel[1], pixel[2], 100);
+
+                                    glColor4b(pixel[2], pixel[1], pixel[0], 10);
+                                    glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + f * z);
                                 }
                                 glEnd();
                             }
                         }
                     }
-                    else if (((*allpixels)[k + 1][0] < 40) || ((*allpixels)[k - 1][0] < 40) || ((*allpixels)[k + colonne][0] < 40) || ((*allpixels)[k - colonne][0] < 40) || ((*allpixels)[k + ligne * colonne][0] < 40) || ((*allpixels)[k - ligne * colonne][0] < 40)) {
-                        for (int i = 0; i < 6; i++)
-                        {
-                            glBegin(GL_QUADS);
-                            for (int j = 0; j < 4; j++)
-                            {
-                                glColor4b(pixel[0], 0, 0, 10);//pixel[1], pixel[2], 100);
-
-                                //glColor4b(pixel[0], pixel[1], pixel[2], 10);
-                                glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + z);
-                            }
-                            glEnd();
-                        }
-                    }
-                }
+                //}
                 
                 k++;
             }
         }
         //Chargement->setValue(z);
-
+        
     }
     //Hors de la boucle for, ajout de la valeur max pour fin de chargement
     //Chargement->setValue(*NbFichiers);
@@ -217,7 +264,7 @@ void My3DScene::initializeGL()
 void My3DScene::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
+    //glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     GLfloat x = (GLfloat)width / height;
     glFrustum(-x, x, -1.0, 1.0, 15.0, 3500.0);
@@ -264,6 +311,70 @@ void My3DScene::mouseMoveEvent(QMouseEvent* event)
     }
     lastPosition = event->pos();
 }
+
+
+QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
+
+    //Création d'un image vide de la taille obtenue dans OuvrirFichier
+    ImgVec=new QVector<Vec3b>;
+    int k=0;
+    for (int z = 0; z < *NbFichiers; z++) {
+        Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
+        for (int y = 0; y < ligne; y++)
+        {
+            for (int x = 0; x < colonne; x++)
+            {
+                // get pixel 
+                image.at<uchar>(y, x) = (*all)[k];
+                k++;
+            }
+        }
+        //Mat image;// = Mat::zeros(ligne, colonne, CV_16UC3);
+
+
+        //Application de la couleur et convertion en format adapté
+        switch (*NbCouleurs)
+        {
+        case 0:
+            cvtColor(image, image, COLOR_GRAY2BGR);
+            break;
+        case 1:
+            applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
+            break;
+        case 2:
+            applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
+            break;
+        case 3:
+            applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
+            break;
+        case 4:
+            applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
+            break;
+        case 5:
+            applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
+            break;
+        case 6:
+            applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
+            break;
+        case 7:
+            applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
+            break;
+        }
+
+        //QVector<Vec3b> pixels;
+
+        MatIterator_<Vec3b> it, end;
+        for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it)
+        {
+            ImgVec->push_back(*it);
+        }
+
+    }
+
+
+    return ImgVec;
+}
+
 
 //------------------------------------------------------------------------------
 //--- Constructors -------------------------------------------------------------

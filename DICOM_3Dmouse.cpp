@@ -10,51 +10,115 @@
 #include "Widget3D.h"
 
 //Initialisation des variables globales
-INT         Coupe, Min, Max;
+//INT         Coupe, Min, Max;
 INT			mode3D;
 INT         ligne;
 INT         colonne;
-QVector<vector<unsigned short>> *allpixels;
-qint16*      NbFichiers;
+qint16*     NbFichiers;
+qint16*     NbCouleurs;
+QVector<unsigned short>* allpixels;
+FLOAT       EcartCoupe;
+FLOAT       EcartPixel;
 
+//QVector<Vec3b>* ImgVec;
 /*--------------------------------------------------------------------------
-* Fonction : ALLPixels()
+* Fonction : ALLPixelsFunc()
 *
 * Description : Stockages de tous les pixels de chaque image dans un seul vecteur
 *
-* Arguments : *pixels : vecteur contenant la valeur de tous les pixels d'une image
-*             *allpixels : vecteur contenant la valeur de tous les pixels de toutes images à la suite
+* Arguments : pixels : vecteur contenant la valeur de tous les pixels d'une image
+*             *all : vecteur contenant la valeur de tous les pixels de toutes images à la suite
 *
-* Valeur retournée : *allpixels
+* Valeur retournée : *all
 *--------------------------------------------------------------------------*/
-QVector<vector<unsigned short>>* ALLPixels(vector<unsigned short> *pixels, QVector<vector<unsigned short>> *allpixels)
+/*QVector<QVector<Vec3b>>* Interface::ALLPixelsFunc(vector<unsigned short> *pixels, QVector<QVector<Vec3b>>*allpixels)
 {
-    QMessageBox ErreurDossier;
 
-    int taille = colonne * ligne;
-    vector<vector<unsigned short>> pixels_color;
+    //QVector<unsigned short>pixel_color(3);
+    Vec3b pixel_color;
+    QVector<Vec3b>img(colonne*ligne);
 
-    pixels_color.reserve(taille);
-    for (int k=0; k < taille; k++) {
-        //(pixels_color)[k] = { (*pixels)[k], (*pixels)[k], (*pixels)[k] };
-
-        pixels_color[k][0] = (*pixels)[k];
-        pixels_color[k][1] = (*pixels)[k];
-        pixels_color[k][2]= (*pixels)[k];
-
+    for (auto pixel : *pixels){//int k = 0; k < taille; k++) {
+        //*allpixels[k].reserve(3);
+        //pixel_color[0]=(*pixels)[k]; //Remplissage du vecteur avec les valeurs des pixels
+        pixel_color[0] = (unsigned short)pixel; //Remplissage du vecteur avec les valeurs des pixels
+        pixel_color[1] = (unsigned short)pixel; //Remplissage du vecteur avec les valeurs des pixels
+        pixel_color[2] = (unsigned short)pixel; //Remplissage du vecteur avec les valeurs des pixels
+        img.push_back(pixel_color);
+        allpixels->push_back(img);
     }
+    QMessageBox ErreurDossier;
     ErreurDossier.setWindowTitle("ATTENTION");
     ErreurDossier.setWindowIcon(QIcon("icon.png"));
     ErreurDossier.setIcon(QMessageBox::Warning);
     ErreurDossier.setText("pb apres !!!");
     ErreurDossier.exec();
-    
-    for (auto pixel2 : pixels_color)
-        allpixels->push_back(pixel2); //Remplissage du vecteur avec les valeurs des pixels
-    
     return allpixels;
-}    
+} */  
 
+QVector<unsigned short>* Interface::ALLPixelsFunc(vector<unsigned short>* pixels, QVector<unsigned short>* allpixels)
+{
+    for (auto pixel : *pixels)
+        allpixels->push_back(pixel); //Remplissage du vecteur avec les valeurs des pixels
+    return allpixels;
+}
+
+/*QVector<Vec3b>* Interface::VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec, int NbFichier) {
+
+    //Création d'un image vide de la taille obtenue dans OuvrirFichier
+    Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
+    int k = NbFichier*ligne*colonne;
+    for (int y = 0; y < ligne; y++)
+    {
+        for (int x = 0; x < colonne; x++)
+        {
+            // get pixel 
+            image.at<uchar>(y, x) = (*all)[k];
+            k++;
+        }
+    }
+    //Mat image;// = Mat::zeros(ligne, colonne, CV_16UC3);
+
+
+    //Application de la couleur et convertion en format adapté
+    switch (*NbCouleurs)
+    {
+    case 0:
+        cvtColor(image, image, COLOR_GRAY2BGR);
+        break;
+    case 1:
+        applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
+        break;
+    case 2:
+        applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
+        break;
+    case 3:
+        applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
+        break;
+    case 4:
+        applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
+        break;
+    case 5:
+        applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
+        break;
+    case 6:
+        applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
+        break;
+    case 7:
+        applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
+        break;
+    }
+
+    //QVector<Vec3b> pixels;
+
+    MatIterator_<Vec3b> it, end;
+    for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it)
+    {
+        ImgVec->push_back(*it);
+    }
+
+    return ImgVec;
+}*/
 
 /*--------------------------------------------------------------------------
 * Fonction : Affichage3D()
@@ -297,8 +361,9 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     Listechemin = new QStringList();//Liste de QString
 
     //Initialisation du vecteur contenant tous les pixels
-    allpixels = new QVector<vector<unsigned short>>;
-
+    //allpixels = new QVector < QVector<Vec3b>>;
+    allpixels = new QVector < unsigned short>;
+    //ImgVec = new QVector<Vec3b>;
 
 
     //Stockage des chemins de fichier
@@ -334,7 +399,10 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     Chargement->setCancelButton(0);//Impossible d'annuler
     Chargement->setMinimumDuration(0);//Pas de temps mini de chargement
 
+    QVector<float> PositionsVector(2);
 
+    //Récuprération des infos des coupes
+    InfoCoupes();
 
     //Gestion d'ouverture et de lecture de tous les fichiers du dossier
     for (int NbFichier = 0; NbFichier < *NbFichiers; NbFichier++)
@@ -349,7 +417,7 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
         dcm::DicomFile* dataDcm;
 
         //Initialisation du vecteur contenant les pixels
-        vector<unsigned short> *pixels;
+        vector<unsigned short>* pixels;
 
         //Lecture du fichier
         dataDcm = readFile(chemin);//Lecture du fichier
@@ -372,9 +440,63 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
         ligne = getUShortTagValue(0x00280010, dataDcm);//Nombre de lignes
         colonne = getUShortTagValue(0x00280011, dataDcm);//Nombre de colonnes
 
-        pixels = readPixels(dataDcm); //Lecture des pixesls
-        allpixels = ALLPixels(pixels, allpixels); //Tous les pixels stockés dans un vecteur
 
+        //string spaceimg = getStringTagValue(0x00180088, dataDcm);//space between slice (mm)
+        string spaceimg = getStringTagValue(0x00200032, dataDcm);//image position (mm)
+        //string spaceimg = getStringTagValue(0x00201041, dataDcm);//slice location (mm)
+
+
+
+        QString SpaceImg = QString::fromStdString(spaceimg);
+        QStringList positionsCoupes = SpaceImg.split("\\");
+
+        float PositionCoupe;
+
+        //QVector<float> PositionsVector;
+        switch (*coupe) {
+        case 1:
+            PositionCoupe = positionsCoupes[0].toFloat();
+            break;
+        case 2:
+            PositionCoupe = positionsCoupes[2].toFloat();
+            break;
+        case 3:
+            PositionCoupe = positionsCoupes[1].toFloat();
+            break;
+        }
+        if (NbFichier == (*NbFichiers / 4) - 1){
+           
+            PositionsVector[0] = PositionCoupe;
+
+        }
+        if (NbFichier == (*NbFichiers / 4)) {
+            PositionsVector[1] = PositionCoupe;
+        }
+
+
+        string spacepixel = getStringTagValue(0x00280030, dataDcm);//space between pixels (mm)        
+        QString SpacePixel = QString::fromStdString(spacepixel);
+        QStringList SpaceList = SpacePixel.split("\\");
+
+
+        if (NbFichier == (*NbFichiers / 4)) {
+            EcartPixel = SpaceList[0].toFloat();
+            /*QMessageBox msg;
+            msg.setText(SpaceList[0]);
+            msg.exec();*/
+        }
+
+
+
+        
+
+
+        //*allpixels.reserve(colonne * ligne * (*NbFichiers));
+
+        pixels = readPixels(dataDcm); //Lecture des pixesls
+        allpixels=ALLPixelsFunc(pixels,allpixels); //Tous les pixels stockés dans un vecteur
+        //vector<vector<unsigned short>> pixels_color;
+        //ImgVec=VectorImages(allpixels, ImgVec,NbFichier);
         //Libération de la mémoire
         delete(dataDcm);
         delete(pixels);
@@ -385,7 +507,12 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     Chargement->setValue(*NbFichiers);
     delete Chargement;
     
-
+    EcartCoupe = fabs(PositionsVector[1]- PositionsVector[0]);
+    int arrondie = round(EcartCoupe);
+    QString affiche = QString::number(arrondie);
+    QMessageBox msg;
+    msg.setText(affiche);
+    msg.exec();
 
     //-----------------------Paramétrage et positionnement des outils------------------------
     SpinBox1->setButtonSymbols(QSpinBox::NoButtons);
@@ -425,8 +552,8 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     *lastRyValue = 0;
     *variationIntensite = 0;// sliderIntensite->value();
 
-    //Récuprération des infos des coupes
-    InfoCoupes();
+
+
 
     //Affichage des images selon les curseurs
     GestionImages(slider1->value());
@@ -1440,15 +1567,17 @@ void Interface::Detourage() {
 void Interface::GestionImages(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
+    //Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
     Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
-    vector<Mat> planes;
+
+    //vector<Mat> planes;
 
         //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
 
     // Séparation des canaux d'une image.
-    split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
+    //split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
 	// Green et Red.
 
 
@@ -1460,11 +1589,11 @@ void Interface::GestionImages(int NumeroImage)
     *IntensiteMaxInitCoupe1 = 0;
 
     //Navigation dans toute l'image prise en argument
-    for (int k = (colonne * ligne) * NumeroImage; k < 3*(colonne * ligne) * (NumeroImage + 1); k+=3)
+    for (int k = (colonne * ligne)*NumeroImage; k < (colonne * ligne) * (NumeroImage + 1); k++)
     {
         //Condition d'isolement de l'intensité max
-        if ((*allpixels)[k][0] > * IntensiteMaxInitCoupe1 && (*allpixels)[k][0] < 6000)
-            *IntensiteMaxInitCoupe1 = (*allpixels)[k][0];
+        if ((*allpixels)[k] > * IntensiteMaxInitCoupe1 && (*allpixels)[k] < 6000)
+            *IntensiteMaxInitCoupe1 = (*allpixels)[k];
     }
     //Init d'une QImage à ajouter a la fenetre Qt, dans laquelle ira la matrice
     QImage dest;
@@ -1477,34 +1606,31 @@ void Interface::GestionImages(int NumeroImage)
 
     //Récupération de l'emplacement dans le vecteur global de la première valeur de l'image prise en argument 
     int k = (colonne * ligne) * NumeroImage;
-
+    //memcpy(image.data, ((*allpixels)).data(), (*allpixels).size()*sizeof(unsigned short));
     //Reconstrution de l'image dans la matrice
     for (int i = 0; i < l; i++) {
         for (int j = 0; j < c; j++)
         {
-            if (valMax == 0) { //On évite la division par 0
+            if (valMax == 0) //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
-                planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
-                planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
-                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];
-            }
-            else {//Normalisation de l'image sur une échelle 0-255
+                image.at<unsigned char>(i, j) = (*allpixels)[k];
+
+            else //Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
-                planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
-                planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
-                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;
-            }
+                image.at<unsigned char>(i, j) = ((*allpixels)[k] * 255) / valMax;
+
             k++; //Décalage d'une valeur dans le vecteur global
         }
     }
-    merge(planes, image);
 
-    //QVector<QRgb>* pixel_jet;
-    Mat result;
+    //Mat Rimage = Mat(ligne, colonne, CV_8UC1);
+    //cv::resize(image, Rimage, Rimage.size());
+
+   /* Mat result;
     Rect rectangle(0, 10, c-1 , l-10 );
     Mat bgdModel, fgdModel; // the models (internally used)
     // Generate output image
-    Mat foreground(image.size(), CV_8UC3, Scalar(0, 0, 255));
+    Mat foreground(image.size(), CV_8UC3, Scalar(0, 0, 255));*/
     //Application de la couleur et convertion en format adapté
     switch (*NbCouleurs)
     {
@@ -1512,6 +1638,10 @@ void Interface::GestionImages(int NumeroImage)
         dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_Grayscale8); //Conversion d'un MAT en QImage
         break;
     case 1:
+        applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
+        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        break;
+    /*case 1:
         applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
         
         grabCut(image, result, rectangle, bgdModel, fgdModel, 1, GC_INIT_WITH_RECT);
@@ -1521,7 +1651,7 @@ void Interface::GestionImages(int NumeroImage)
         image.copyTo(foreground, result); // bg pixels not copied
             
         dest = QImage((uchar*)foreground.data, foreground.cols, foreground.rows, foreground.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
-        break;
+        break;*/
     case 2:
         applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
         dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
@@ -1547,13 +1677,13 @@ void Interface::GestionImages(int NumeroImage)
         dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     }
-
+    /*
     //Changement de la longueur des colonnes et des lignes
     if (l < 400 && c < 400) //Si image de petite taille
     {
         l = 1.75 * l;//Coeff de 1.75
         c = 1.75 * c;//Coeff de 1.75
-    }
+    }*/
 
 
     //Affichage de l'image dans la fenêtre principale
@@ -1569,13 +1699,13 @@ void Interface::GestionImagesLignes(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     Mat image = Mat::zeros(*NbFichiers - 1, colonne, CV_8UC1);//Image de la taille obtenue avec data
-    vector<Mat> planes;    
+    //vector<Mat> planes;    
     
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
     // Séparation des canaux d'une image.
-    split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
+    //split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
     // Green et Red.
 
     //Initialisation de l'intensité max
@@ -1586,8 +1716,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     
     //Navigation dans toute l'image prise en argument
     int k = 0;
-    vector<vector<unsigned short>> Valeurdefinitif;
-    for (int changementImag = 0; changementImag < (*allpixels).size(); changementImag += (colonne * ligne))
+    QVector<unsigned short> Valeurdefinitif;
+    for (int changementImag = 0; changementImag < colonne*ligne*(*NbFichiers); changementImag += (colonne * ligne))
         for (int nb = changementImag + (NumeroImage * colonne - 1); nb < changementImag + ((NumeroImage + 1) * colonne - 1); nb++)//Condition pour avoir l'image selon la bonne coupe (tel ligne)
         {
             Valeurdefinitif.push_back((*allpixels)[nb]);
@@ -1595,8 +1725,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     for (k = 0; k < Valeurdefinitif.size(); k++)
     {
         //Condition d'isolement de l'intensité max
-        if (Valeurdefinitif[k][0] > * IntensiteMaxInitCoupe2 && Valeurdefinitif[k][0] < 2500)
-            *IntensiteMaxInitCoupe2 = Valeurdefinitif[k][0];//Isolement de l'intensité max
+        if (Valeurdefinitif[k] > * IntensiteMaxInitCoupe2 && Valeurdefinitif[k] < 2500)
+            *IntensiteMaxInitCoupe2 = Valeurdefinitif[k];//Isolement de l'intensité max
     }
 
     //Init d'une QImage à ajouter a la fenetre Qt, dans laquelle ira la matrice
@@ -1616,151 +1746,77 @@ void Interface::GestionImagesLignes(int NumeroImage)
         {
             if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
-                planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
+                image.at<unsigned char>(i, j) = Valeurdefinitif[k];
+
+                /*planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
                 planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
-                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];
+                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];*/
             }
             else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
-                planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
+                image.at<unsigned char>(i, j) = (Valeurdefinitif[k] * 255) / valMax;
+
+                /*planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
                 planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
-                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;
+                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;*/
             }
             k++; //Décalage d'une valeur dans le vecteur global
         }
     }
-    merge(planes, image);
+    //merge(planes, image);
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
+    float facteur = round(EcartCoupe * (1 / EcartPixel));
+    l = (int)facteur*l;
+    Mat Rimage = Mat(l, c, CV_8UC1);
+    cv::resize(image, Rimage, Rimage.size());
+    //Mat blurredImage;
+    //GaussianBlur(Rimage, Rimage, Size(9, 9), 1.0);
 
     //Application de la couleur et convertion en format adapté
     switch (*NbCouleurs)
     {
     case 0:
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_Grayscale8); //Conversion d'un MAT en QImage
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_Grayscale8); //Conversion d'un MAT en QImage
         break;
     case 1:
-        applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_JET);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 2:
-        applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_BONE);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 3:
-        applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_CIVIDIS);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 4:
-        applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_TURBO);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 5:
-        applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_HOT);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 6:
-        applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_PARULA);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 7:
-        applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     }
-
+    /*
     //Changement de la longueur des colonnes et des lignes
     if (l < 400 && c < 400) //Si image de petite taille
     {
         l = 1.75 * l;//Coeff de 1.75
         c = 1.75 * c;//Coeff de 1.75
-    }
+    }*/
     
-    //Transformation et enregistrement des images au format .png
-    if (*Mode == 1 && *NbCouleurs == 0)
-    {
-        //Création d'une matrice vide
-        Mat input_bgra;
-        
-        //Copie et conversion de l'image en niveau de gris vers BGRA
-        cvtColor(image, input_bgra, COLOR_GRAY2BGRA);
 
-        //Navigation dans toute l'image prise en argument
-        for (int y = 0; y < input_bgra.rows; ++y)
-            for (int x = 0; x < input_bgra.cols; ++x)
-            {
-                //Création d'un vecteur contenant les 4 composantes du pixel
-                cv::Vec4b& pixel = input_bgra.at<cv::Vec4b>(y, x);
-
-                //Si la valeur du pixel < à l'intensité choisi par l'utilisateur
-                if (image.at<unsigned char>(y, x) < SliderVisuTransparence->value())
-                {
-                    // Mise à 0 de alpha pour rendre transparent
-                    pixel[3] = 0;
-                }
-                
-                //Si la valeur du pixel > à l'intensité choisi par l'utilisateur
-                else {
-                    //Diminution de l'intensité pour éviter d'avoir une image trop transparente
-                    pixel[0] -= SliderVisuIntensite->value();
-                    pixel[1] -= SliderVisuIntensite->value();
-                    pixel[2] -= SliderVisuIntensite->value();
-
-                    pixel[3] = 1; //Rendre visible le pixel
-                }
-            }
-        /*
-        //Enregistrement au format png en fonction du numéro de l'image
-        string cheminimage;
-        string format = ".PNG";
-        string numero = to_string(NumeroImage);
-        cheminimage = "Images/Coupe2_" + numero + format;
-        imwrite(cheminimage, input_bgra);*/
-    }
-
-    //Transformation et aperçu d'une image
-    if (*Mode == 3 && *NbCouleurs == 0 && *CoupeVisu == 1)
-    {
-        //Création d'une matrice vide
-        Mat input_bgra;
-        
-        //Copie et conversion de l'image en niveau de gris vers BGRA
-        cvtColor(image, input_bgra, COLOR_GRAY2BGRA);
-        
-        //Navigation dans toute l'image prise en argument
-        for (int y = 0; y < input_bgra.rows; ++y)
-            for (int x = 0; x < input_bgra.cols; ++x)
-            {
-                //Création d'un vecteur contenant les 4 composantes du pixel
-                cv::Vec4b& pixel = input_bgra.at<cv::Vec4b>(y, x);
-                
-                //Si la valeur du pixel < à l'intensité choisi par l'utilisateur
-                if (image.at<unsigned char>(y, x) < SliderVisuTransparence->value())
-                {
-                    //Mise en blanc de ce qui sera transparent lors de l'enregistrement
-                    pixel[0] = 255;
-                    pixel[1] = 255;
-                    pixel[2] = 255;
-
-                    // Mise à 1 de alpha pour rendre visible
-                    pixel[3] = 1;
-                }
-                else {
-                    //Diminution de l'intensité pour éviter d'avoir une image trop transparente
-                    pixel[0] -= SliderVisuIntensite->value();
-                    pixel[1] -= SliderVisuIntensite->value();
-                    pixel[2] -= SliderVisuIntensite->value();
-                    
-                    // Mise à 1 de alpha pour rendre visible
-                    pixel[3] = 1;
-                }
-            }
-
-        //Convesion et affichage de l'image dans la fenêtre visualisation 3D
-        QImage visu = QImage((uchar*)input_bgra.data, input_bgra.cols, input_bgra.rows, input_bgra.step, QImage::Format_RGBX8888); //Conversion d'un MAT en QImage
-        LabelVisuImage->setPixmap(QPixmap::fromImage(visu).scaled(QSize(l, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        LayoutVisuImage->addWidget(LabelVisuImage, 0, 0, 1, 3, Qt::AlignHCenter);//Ajout du layout à l'image
-    }
 
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
@@ -1773,18 +1829,18 @@ void Interface::GestionImagesLignes(int NumeroImage)
     }
 
 }
-void Interface::GestionImagesColonnes(int v)
+void Interface::GestionImagesColonnes(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     Mat image = Mat::zeros(*NbFichiers - 1, ligne, CV_8UC1);
 
-    vector<Mat> planes;
+    //vector<Mat> planes;
 
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
     // Séparation des canaux d'une image.
-    split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
+    //split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
     // Green et Red.
 
     //Initialisation de l'intensité max
@@ -1795,16 +1851,16 @@ void Interface::GestionImagesColonnes(int v)
     
     //Navigation dans toute l'image prise en argument
     int k = 0;
-    vector<vector<unsigned short>>Valeurdefinitif2; //Nouveau vecteur contenant les pixels de l'image
-    for (int nb = v; nb < (*allpixels).size(); nb += colonne)//Condition pour avoir l'image selon la bonne coupe 
+    QVector<unsigned short>Valeurdefinitif2; //Nouveau vecteur contenant les pixels de l'image
+    for (int nb = NumeroImage; nb < colonne*ligne*(*NbFichiers); nb += colonne)//Condition pour avoir l'image selon la bonne coupe 
     {
         Valeurdefinitif2.push_back((*allpixels)[nb]);//Vecteur definitif avec valeurs de l'image a afficher (tel colonnes de chaque image)
     }
     for (k = 0; k < Valeurdefinitif2.size(); k++) //Boucle pour avoir val max intensité
     {
         //Condition d'isolement de l'intensité max
-        if (Valeurdefinitif2[k][0] > * IntensiteMaxInitCoupe3 && Valeurdefinitif2[k][0] < 2500)
-            *IntensiteMaxInitCoupe3 = Valeurdefinitif2[k][0];
+        if (Valeurdefinitif2[k] > * IntensiteMaxInitCoupe3 && Valeurdefinitif2[k] < 2500)
+            *IntensiteMaxInitCoupe3 = Valeurdefinitif2[k];
     }
 
     //Init d'une QImage à ajouter a la fenetre Qt, dans laquelle ira la matrice
@@ -1824,151 +1880,79 @@ void Interface::GestionImagesColonnes(int v)
         {
             if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
-                planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
+                image.at<unsigned char>(i, j) = Valeurdefinitif2[k];
+
+                /*planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
                 planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
-                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];
+                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];*/
             }
             else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
-                planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
+                image.at<unsigned char>(i, j) = (Valeurdefinitif2[k] * 255) / valMax;
+
+                /*planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
                 planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
-                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;
+                planes[2].at<unsigned short>(i, j) =((*allpixels)[k][2] * 255) / valMax;*/
             }
             k++; //Décalage d'une valeur dans le vecteur global
         }
     }
-    merge(planes, image);
+    //merge(planes, image);
 
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
+
+
+    float facteur = round(EcartCoupe *(1/EcartPixel));
+    l = (int)facteur * l;
+    Mat Rimage = Mat(l, c, CV_8UC1);
+    cv::resize(image, Rimage, Rimage.size());
+
 
     //Application de la couleur et convertion en format adapté
     switch (*NbCouleurs)
     {
     case 0:
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_Grayscale8); //Conversion d'un MAT en QImage
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_Grayscale8); //Conversion d'un MAT en QImage
         break;
     case 1:
-        applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_JET);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 2:
-        applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_BONE);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 3:
-        applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_CIVIDIS);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 4:
-        applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_TURBO);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 5:
-        applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_HOT);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 6:
-        applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_PARULA);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     case 7:
-        applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
-        dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
+        applyColorMap(Rimage, Rimage, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
+        dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     }
 
     //Changement de la longueur des colonnes et des lignes
-    if (l < 400 && c < 400) //Si image de petite taille
+    /*if (l < 400 && c < 400) //Si image de petite taille
     {
         l = 1.75 * l;//Coeff de 1.75
         c = 1.75 * c;//Coeff de 1.75
-    }
+    }*/
 
-    //Transformation et enregistrement des images au format .png
-    if (*Mode == 1 && *NbCouleurs == 0)
-    {
-        //Création d'une matrice vide
-        Mat input_bgra;
-        
-        //Copie et conversion de l'image en niveau de gris vers BGRA
-        cvtColor(image, input_bgra, COLOR_GRAY2BGRA);
-
-        //Navigation dans toute l'image prise en argument
-        for (int y = 0; y < input_bgra.rows; ++y)
-            for (int x = 0; x < input_bgra.cols; ++x)
-            {
-                //Création d'un vecteur contenant les 4 composantes du pixel
-                cv::Vec4b& pixel = input_bgra.at<cv::Vec4b>(y, x);
-
-                //Si la valeur du pixel < à l'intensité choisi par l'utilisateur
-                if (image.at<unsigned char>(y, x) < SliderVisuTransparence->value())
-                {
-                    // Mise à 0 de alpha pour rendre transparent
-                    pixel[3] = 0;
-                }
-
-                //Si la valeur du pixel > à l'intensité choisi par l'utilisateur
-                else {
-                    //Diminution de l'intensité pour éviter d'avoir une image trop transparente
-                    pixel[0] -= SliderVisuIntensite->value();
-                    pixel[1] -= SliderVisuIntensite->value();
-                    pixel[2] -= SliderVisuIntensite->value();
-                    
-                    pixel[3] = 1; //Rendre visible le pixel
-                }
-            }
-        /*
-        //Enregistrement au format png en fonction du numéro de l'image
-        string cheminimage;
-        string format = ".PNG";
-        string numero = to_string(v);
-        cheminimage = "Images/Coupe3_" + numero + format;
-        imwrite(cheminimage, input_bgra);*/
-    }
     
-    //Transformation et aperçu d'une image
-    if (*Mode == 3 && *NbCouleurs == 0 && *CoupeVisu == 2)
-    {
-        //Création d'une matrice vide
-        Mat input_bgra;
-        
-        //Copie et conversion de l'image en niveau de gris vers BGRA
-        cvtColor(image, input_bgra, COLOR_GRAY2BGRA);
-        
-        //Navigation dans toute l'image prise en argument
-        for (int y = 0; y < input_bgra.rows; ++y)
-            for (int x = 0; x < input_bgra.cols; ++x)
-            {
-                //Création d'un vecteur contenant les 4 composantes du pixel
-                cv::Vec4b& pixel = input_bgra.at<cv::Vec4b>(y, x);
-
-                //Si la valeur du pixel < à l'intensité choisi par l'utilisateur
-                if (image.at<unsigned char>(y, x) < SliderVisuTransparence->value())
-                {
-                    //Mise en blanc de ce qui sera transparent lors de l'enregistrement
-                    pixel[0] = 255;
-                    pixel[1] = 255;
-                    pixel[2] = 255;
-
-                    // Mise à 1 de alpha pour rendre visible
-                    pixel[3] = 1;
-                }
-                else {
-                    //Diminution de l'intensité pour éviter d'avoir une image trop transparente
-                    pixel[0] -= SliderVisuIntensite->value();
-                    pixel[1] -= SliderVisuIntensite->value();
-                    pixel[2] -= SliderVisuIntensite->value();
-                    
-                    // Mise à 1 de alpha pour rendre visible
-                    pixel[3] = 1;
-                }
-            }
-        //Convesion et affichage de l'image dans la fenêtre visualisation 3D
-        QImage visu = QImage((uchar*)input_bgra.data, input_bgra.cols, input_bgra.rows, input_bgra.step, QImage::Format_RGBX8888); //Conversion d'un MAT en QImage
-        LabelVisuImage->setPixmap(QPixmap::fromImage(visu).scaled(QSize(l, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        LayoutVisuImage->addWidget(LabelVisuImage, 0, 0, 1, 3, Qt::AlignHCenter);//Ajout du layout à l'image
-    }
 
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)

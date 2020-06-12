@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <QFileDialog>
 #include "utils.h"
@@ -37,6 +38,9 @@ public:
 	Interface();
 	void mousePressEvent(QMouseEvent* e);
 	void closeEvent(QCloseEvent* event);
+	QVector<unsigned short>* ALLPixelsFunc(vector<unsigned short>* pixels, QVector<unsigned short>* allpixels);
+	//QVector<Vec3b>* VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec, int NbFichier);
+
 
 signals:
 	void clic(QMouseEvent* e);
@@ -105,15 +109,14 @@ private:
 	QMenu* Info;
 	QMenu* Outils;
 	QStringList* Listechemin;
-	//QVector<int>* allpixels;
-	vector<vector<unsigned short>>* pixels_color;
+	//QVector<unsigned short>* allpixels;
 	QSpinBox* SpinBox1;
 	QSpinBox* SpinBox2;
 	QSpinBox* SpinBox3;
 	//qint16* cols;
 	//qint16* rows;
 	//qint16* NbFichiers;
-	qint16* NbCouleurs;
+	//qint16* NbCouleurs;
 	qint16* IntensiteMaxInitCoupe1;
 	qint16* IntensiteVariableCoupe1;
 	qint16* IntensiteMaxInitCoupe2;
@@ -133,8 +136,8 @@ private:
 	qint16* MenuSouris3D;
 	qint16* OnOffIntensite;
 	qint16* MenuIntensite;
-	qint16* coupe;
 	qint16* Mode;
+	qint16* coupe;
 	qint16* IntensiteOnOff;
 
 	//-----------------interface Affichage3D--------------------------
