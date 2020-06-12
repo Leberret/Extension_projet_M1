@@ -22,9 +22,10 @@ extern INT			ligne;
 extern qint16*		NbFichiers;
 extern qint16*		NbCouleurs;
 //extern 	qint16*		coupe;
-extern QVector<unsigned short>* allpixels;
+//extern QVector<unsigned short>* allpixels;
 extern FLOAT		EcartCoupe;
 extern FLOAT        EcartPixel;
+extern QVector<Vec3b>* ImgVec;
 
 
 
@@ -44,7 +45,6 @@ private:
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
-	QVector<Vec3b>* VectorImages(QVector<unsigned short>* all);
 
 	//Variables globales
 	qint16* precValueTX;
@@ -59,7 +59,6 @@ private:
 	qint16* compteurRY;
 	qint16* precValueRZ;
 	qint16* compteurRZ;
-	QVector<Vec3b>* ImgVec;
 
 	
 public slots:

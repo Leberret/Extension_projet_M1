@@ -40,6 +40,7 @@ public:
 	void closeEvent(QCloseEvent* event);
 	QVector<unsigned short>* ALLPixelsFunc(vector<unsigned short>* pixels, QVector<unsigned short>* allpixels);
 	//QVector<Vec3b>* VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec, int NbFichier);
+	QVector<Vec3b>* VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec);
 
 
 signals:
@@ -109,7 +110,7 @@ private:
 	QMenu* Info;
 	QMenu* Outils;
 	QStringList* Listechemin;
-	//QVector<unsigned short>* allpixels;
+	QVector<unsigned short>* allpixels;
 	QSpinBox* SpinBox1;
 	QSpinBox* SpinBox2;
 	QSpinBox* SpinBox3;
