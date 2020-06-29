@@ -10,6 +10,8 @@
 #include <opencv2/opencv.hpp>
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "si.h"      
+#include "siapp.h"
 // Namespaces.
 using namespace std;
 using namespace cv;
@@ -44,6 +46,8 @@ private:
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
+	//void mouse3DMove(SiSpwEvent* pEvent);
+	void mouse3DMoveEvent(SiSpwEvent* pEvent);
 	QVector<Vec3b>* VectorImages(QVector<unsigned short>* all);
 
 	//Variables globales
@@ -63,7 +67,6 @@ private:
 
 	
 public slots:
-	void mouse3DMove();
 	void Recentrer();
 	void BloquerScene();
 

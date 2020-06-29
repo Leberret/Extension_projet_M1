@@ -93,9 +93,9 @@ private:
 	QLabel* imageLabel1;
 	QLabel* imageLabel2;
 	QLabel* imageLabel3;
-	QLabel* imageLabel4;
-	QLabel* imageLabel5;
-	QLabel* imageLabel6;
+	//QLabel* imageLabel4;
+	//QLabel* imageLabel5;
+	//QLabel* imageLabel6;
 	QString* pathFolder;
 	QString* pathFolderSave;
 	QGridLayout* layout;

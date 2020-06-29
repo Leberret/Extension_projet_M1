@@ -252,7 +252,7 @@ Widget3D::Widget3D()
     //Appel des fonctions toutes les 10ms
     timer = new QTimer();
 
-    connect(timer, SIGNAL(timeout()), this, SLOT(Actu3D()));
+    //connect(timer, SIGNAL(timeout()), this, SLOT(Actu3D()));
     connect(timer, SIGNAL(timeout()), this, SLOT(DoubleClics3D()));
     connect(timer, SIGNAL(timeout()), this, SLOT(ClicDroit3D()));
     connect(timer, SIGNAL(timeout()), this, SLOT(ClicGauche3D()));
@@ -263,6 +263,8 @@ Widget3D::Widget3D()
     setLayout(Layout);
     setStyleSheet("background-color:white;");
     //setFixedSize(1000, 800);
+    setWindowState(windowState() | Qt::WindowMaximized);//Fenetre en plein ecran
+
     setWindowIcon(QIcon("icon.png"));
     setWindowTitle("Interface de reconstruction 3D des IRM");//titre fenetre
 

@@ -13,6 +13,7 @@
 //INT         Coupe, Min, Max;
 INT			mode3D;
 INT         ligne;
+INT         ligneResize;
 INT         colonne;
 qint16*     NbFichiers;
 qint16*     NbCouleurs;
@@ -671,20 +672,13 @@ void Interface::MajClicCoupe1(QMouseEvent* e)
 
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
-        if (ligne < 400 && colonne < 400) //Si image de petite taille
-        {
-            //facteur 1.75 pour prendre en compte le zoom
-            tailleLimite_X = (label_x + colonne * 1.75);
-            tailleLimite_Y = (label_y + ligne * 1.75);
-            NouvelleImageCoupe3 = (posi_x - label_x) / 1.75;
-            NouvelleImageCoupe2 = (posi_y - label_y) / 1.75;
-        }
-        else { //Si grande image
-            tailleLimite_X = (label_x + colonne);
-            tailleLimite_Y = (label_y + ligne);
-            NouvelleImageCoupe3 = (posi_x - label_x);
-            NouvelleImageCoupe2 = (posi_y - label_y);
-        }
+
+       
+        tailleLimite_X = (label_x + colonne);
+        tailleLimite_Y = (label_y + ligne);
+        NouvelleImageCoupe3 = (posi_x - label_x);
+        NouvelleImageCoupe2 = (posi_y - label_y);
+       
         //Conditon tant qu'on clic sur l'image
         if (posi_x > label_x && posi_x< tailleLimite_X && posi_y>label_y && posi_y < tailleLimite_Y) {
 
@@ -735,20 +729,12 @@ void Interface::MajClicCoupe2(QMouseEvent* e)
     
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
-        if (ligne < 400 && colonne < 400) //Si image de petite taille
-        {
-            //facteur 1.75 pour prendre en compte le zoom
-            tailleLimite_X = (label_x + *NbFichiers * 1.75);
-            tailleLimite_Y = (label_y + ligne * 1.75);
-            NouvelleImageCoupe1 = (posi_x - label_x) / 1.75;
-            NouvelleImageCoupe3 = (posi_y - label_y) / 1.75;
-        }
-        else { //Si grande image
-            tailleLimite_X = (label_x + *NbFichiers);
-            tailleLimite_Y = (label_y + ligne);
-            NouvelleImageCoupe1 = (posi_x - label_x);
-            NouvelleImageCoupe3 = (posi_y - label_y);
-        }
+
+        tailleLimite_X = (label_x + *NbFichiers);
+        tailleLimite_Y = (label_y + ligneResize);
+        NouvelleImageCoupe1 = (posi_x - label_x);
+        NouvelleImageCoupe3 = (posi_y - label_y);
+      
         //Conditon tant qu'on clic sur l'image
         if (posi_x > label_x && posi_x< tailleLimite_X && posi_y>label_y && posi_y < tailleLimite_Y) {
             if (*souris3D == 0) { //Si souris 3D désactivée
@@ -798,20 +784,12 @@ void Interface::MajClicCoupe3(QMouseEvent* e)
 
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
-        if (ligne < 400 && colonne < 400) //Si image de petite taille
-        {
-            //facteur 1.75 pour prendre en compte le zoom
-            tailleLimite_X = (label_x + *NbFichiers * 1.75);
-            tailleLimite_Y = (label_y + ligne * 1.75);
-            NouvelleImageCoupe1 = (posi_x - label_x) / 1.75;
-            NouvelleImageCoupe2 = (posi_y - label_y) / 1.75;
-        }
-        else { //Si grande image
-            tailleLimite_X = (label_x + *NbFichiers);
-            tailleLimite_Y = (label_y + ligne);
-            NouvelleImageCoupe1 = (posi_x - label_x);
-            NouvelleImageCoupe2 = (posi_y - label_y);
-        }
+
+        tailleLimite_X = (label_x + *NbFichiers);
+        tailleLimite_Y = (label_y + ligneResize);
+        NouvelleImageCoupe1 = (posi_x - label_x);
+        NouvelleImageCoupe2 = (posi_y - label_y);
+        
         //Conditon tant qu'on clic sur l'image
         if (posi_x > label_x && posi_x< tailleLimite_X && posi_y>label_y && posi_y < tailleLimite_Y) {
             if (*souris3D == 0) { //Si souris 3D désactivée
@@ -1767,8 +1745,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
     float facteur = round(EcartCoupe * (1 / EcartPixel));
-    l = (int)facteur*l;
-    Mat Rimage = Mat(l, c, CV_8UC1);
+    ligneResize = (int)facteur*l;
+    Mat Rimage = Mat(ligneResize, c, CV_8UC1);
     cv::resize(image, Rimage, Rimage.size());
     //Mat blurredImage;
     //GaussianBlur(Rimage, Rimage, Size(9, 9), 1.0);
@@ -1823,8 +1801,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     {
         //SpinBox2->setValue(slider2->value());
 
-        imageLabel2->setPixmap(QPixmap::fromImage(dest).scaled(QSize(l, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        imageLabel2->setMaximumSize(l, c);
+        imageLabel2->setPixmap(QPixmap::fromImage(dest).scaled(QSize(ligneResize, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
+        imageLabel2->setMaximumSize(ligneResize, c);
         layout->addWidget(imageLabel2, 1, 1, Qt::AlignHCenter);//Ajout du layout à l'image
     }
 
@@ -1904,8 +1882,8 @@ void Interface::GestionImagesColonnes(int NumeroImage)
 
 
     float facteur = round(EcartCoupe *(1/EcartPixel));
-    l = (int)facteur * l;
-    Mat Rimage = Mat(l, c, CV_8UC1);
+    ligneResize = (int)facteur * l;
+    Mat Rimage = Mat(ligneResize, c, CV_8UC1);
     cv::resize(image, Rimage, Rimage.size());
 
 
@@ -1957,8 +1935,8 @@ void Interface::GestionImagesColonnes(int NumeroImage)
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
     {
-        imageLabel3->setPixmap(QPixmap::fromImage(dest).scaled(QSize(l, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        imageLabel3->setMaximumSize(l, c);
+        imageLabel3->setPixmap(QPixmap::fromImage(dest).scaled(QSize(ligneResize, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
+        imageLabel3->setMaximumSize(ligneResize, c);
         layout->addWidget(imageLabel3, 1, 2, Qt::AlignHCenter);//Ajout du layout à l'image
     }
 }
@@ -2086,9 +2064,9 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     imageLabel1 = new QLabel(); //init label
     imageLabel2 = new QLabel();//init label
     imageLabel3 = new QLabel();//init label
-    imageLabel4 = new QLabel(); //init label
-    imageLabel5 = new QLabel();//init label
-    imageLabel6 = new QLabel();//init label
+    //imageLabel4 = new QLabel(); //init label
+    //imageLabel5 = new QLabel();//init label
+    //imageLabel6 = new QLabel();//init label
 
     slider1 = new QSlider(Qt::Horizontal);//init curseur
     slider2 = new QSlider(Qt::Horizontal);//init curseur
