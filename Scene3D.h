@@ -38,6 +38,7 @@ private:
 	GLfloat rotationX;
 	GLfloat rotationY;
 	GLfloat rotationZ;
+	GLfloat zoomTy;
 	QPoint lastPosition;
 
 	// Private methods.
@@ -46,8 +47,8 @@ private:
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
-	//void mouse3DMove(SiSpwEvent* pEvent);
-	void mouse3DMoveEvent(SiSpwEvent* pEvent);
+
+	//void mouse3DMoveEvent(SiSpwEvent* pEvent);
 	QVector<Vec3b>* VectorImages(QVector<unsigned short>* all);
 
 	//Variables globales
@@ -69,8 +70,9 @@ private:
 public slots:
 	void Recentrer();
 	void BloquerScene();
-
+	void mouse3DMove();
 public:
 	My3DScene();
 	void init();
+
 };

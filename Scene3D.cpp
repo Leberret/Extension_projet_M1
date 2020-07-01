@@ -134,6 +134,8 @@ void My3DScene::initializeGL()
     glEnable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
 
+    QVector<Vec3b>* imgs = VectorImages(allpixels);
+
 
     //Création barre de chargement des images
     /*QProgressDialog Chargement= new QProgressDialog("Reconstruction 3D", "Cancel", 0, *NbFichiers, this);//Paramètres de la barre
@@ -207,7 +209,6 @@ void My3DScene::initializeGL()
       { { -1.0, +f, +1.0 }, { +1.0, +f, +1.0 },
       { +1.0, +f, -1.0 }, { -1.0, +f, -1.0 } }///face du haut
     };*/
-    QVector<Vec3b>* imgs = VectorImages(allpixels);
     
     int k = 0*colonne*ligne;
     for (int z = 0; z < *NbFichiers; z++) {
@@ -267,7 +268,7 @@ void My3DScene::resizeGL(int width, int height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     GLfloat x = (GLfloat)width / height;
-    glFrustum(-x, x, -1.0, 1.0, 15.0, 3500.0);
+    glFrustum(-x, x, -1.0, 1.0, 15, 6000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -278,7 +279,7 @@ void My3DScene::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    glTranslatef(0.0, 0.0, -3000.0);
+    glTranslatef(0.0, 0.0, zoomTy-3000.0);
     //mouse3DMove();
     glRotatef(rotationX, 1.0, 0.0, 0.0);
     glRotatef(rotationY, 0.0, 1.0, 0.0);
@@ -296,6 +297,7 @@ void My3DScene::mousePressEvent(QMouseEvent* event)
 
 void My3DScene::mouseMoveEvent(QMouseEvent* event)
 {
+
     GLfloat dx = (GLfloat)(event->x() - lastPosition.x()) / width();
     GLfloat dy = (GLfloat)(event->y() - lastPosition.y()) / height();
     if (event->buttons() & Qt::LeftButton)
@@ -397,22 +399,6 @@ QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
 }
 
 
-//------------------------------------------------------------------------------
-//--- Constructors -------------------------------------------------------------
-//------------------------------------------------------------------------------
-My3DScene::My3DScene()
-{
-    init();
-    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
-    this->rotationX = 0;
-    this->rotationY = 0;
-    this->rotationZ = 0;
-}
-
-
-
-
-
 /*--------------------------------------------------------------------------
 * Fonction : mouse3DMove()
 *
@@ -422,58 +408,24 @@ My3DScene::My3DScene()
 *
 * Valeur retournée : Aucune
 *--------------------------------------------------------------------------*/
-/*
-void My3DScene :: mouse3DMove(SiSpwEvent* pEvent)
-{   
+void My3DScene::mouse3DMove()
+{
     //Condition si souris en mode interface 2D
     if (mode3D == 0)
         return;
 
-    //Initialisation des transformations de la scène
-    //this->SceneTransform = new Qt3DCore::QTransform();
-
     //Passage des valeurs globales en locales
-    int h = *compteurTX;
     int l = *compteurTY;
-    int m = *compteurTZ;
     int i = *compteurRX;
     int j = *compteurRY;
     int k = *compteurRZ;
-    
-    if ((pTx > 5) || (pTx < -5) || (pTy > 5) || (pTy < -5) || (pTy > 5) || (pTy < -5) || (pRx > 5) || (pRx < -5) || (pRy > 5) || (pRy < -5) || (pRz > 5) || (pRz < -5)) {
-        //Réinitialisation de la caméra
-        //this->camera()->lens()->setPerspectiveProjection(10.0f, 1.0f, 0.1f, 1000.0f);
-        //this->camera()->setPosition(QVector3D(0, 70.0f, 0));
-        //this->camera()->setViewCenter(QVector3D(0,0, 0));
-        //this->camera()->setUpVector(QVector3D(0, 0, 1));
-    }
-
-    //Translation selon les veleurs de la souris pTx, pTy, pTz
-    //this->SceneTransform->setTranslation(QVector3D((float)h/10.0, (float)l/2.0, (float)m / 10.0));
-
-    //--------------------------TX-------------------------------
-    //Conditions de sensibilité de la souris 3D
-    if ((pTx > 5) && (pTx >= *precValueTX) && (pTx < 20)) {
-        h = h - 1;
-    }
-    else if ((pTx >= 20) && (pTx >= *precValueTX) && (pTx < 600)) {
-        h = h - 3;
-    }
-
-    else if ((pTx < -5) && (pTx <= *precValueTX) && (pTx > -20)) {
-        h = h + 1;
-    }
-    else if ((pTx <= -20) && (pTx <= *precValueTX) && (pTx > -600)) {
-        h = h + 3;
-    }
-
-    //Mémorisation de la valeur du NumImageTx
-    *compteurTX = h;
-
-    //Mémorisation de la valeur pTx de la souris 3D
-    *precValueTX = pTx; 
 
 
+    zoomTy = 10*l;
+    if ((-pTy > 5) || (-pTy < -5))
+        updateGL();
+    else
+        return;
     //--------------------------TY-------------------------------
     //Conditions de sensibilité de la souris 3D
     if ((-pTy > 5) && (-pTy >= *precValueTY) && (-pTy < 20)) {
@@ -497,57 +449,28 @@ void My3DScene :: mouse3DMove(SiSpwEvent* pEvent)
     *precValueTY = -pTy;
 
 
-    //--------------------------TZ-------------------------------
-    //Conditions de sensibilité de la souris 3D
-    if ((-pTz > 5) && (-pTz >= *precValueTZ) && (-pTz < 20)) {
-        m = m - 1;
-    }
-    else if ((-pTz >= 20) && (-pTz >= *precValueTZ) && (-pTz < 600)) {
-        m = m - 3;
-    }
-
-    else if ((-pTz < -5) && (-pTz <= *precValueTZ) && (-pTz > -20)) {
-        m = m + 1;
-    }
-    else if ((-pTz <= -20) && (-pTz <= *precValueTZ) && (-pTz > -600)) {
-        m = m + 3;
-    }
-
-    //Mémorisation de la valeur du NumImageTx
-    *compteurTZ = m;
-
-    //Mémorisation de la valeur pTz de la souris 3D
-    *precValueTZ = -pTz;
-
 
     //--------------------------RX-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((i > -360) && (i < 360)) {
-        //glRotatef(i, 1.0, 0.0, 0.0);
-        
-        
+        rotationX=i;
+        if ((pRx > 5) || (pRx < -5))
+            updateGL();
+        else
+            return;
         //Conditions de sensibilité de la souris 3D
         if ((pRx > 5) && (pRx >= *precValueRX) && (pRx < 20)) {
-            rotationX = i;
             i = i - 1;
-            updateGL();
         }
         else if ((pRx >= 20) && (pRx >= *precValueRX) && (pRx < 600)) {
-            
-            rotationX = i; 
             i = i - 3;
-            updateGL();
         }
 
         else if ((pRx < -5) && (pRx <= *precValueRX) && (pRx > -20)) {
-            rotationX = i;
             i = i + 1;
-            updateGL();
         }
         else if ((pRx <= -20) && (pRx <= *precValueRX) && (pRx > -600)) {
-            rotationX = i;
             i = i + 3;
-            updateGL();
         }
     }
 
@@ -567,29 +490,25 @@ void My3DScene :: mouse3DMove(SiSpwEvent* pEvent)
     //--------------------------RY-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((j > -360) && (j < 360)) {
-        //glRotatef(j, 0.0, 1.0, 0.0);
-        //updateGL();
+        rotationY=j;
+        if ((-pRy > 5) || (-pRy < -5))
+            updateGL();
+        else
+            return;
+
         //Conditions de sensibilité de la souris 3D
         if ((-pRy > 5) && (-pRy >= *precValueRY) && (-pRy < 20)) {
-            rotationY = j;
             j = j - 1;
-            updateGL();
         }
         else if ((-pRy >= 20) && (-pRy >= *precValueRY) && (-pRy < 600)) {
-            rotationY = j;
             j = j - 3;
-            updateGL();
         }
 
         else if ((-pRy < -5) && (-pRy <= *precValueRY) && (-pRy > -20)) {
-            rotationY = j;
             j = j + 1;
-            updateGL();
         }
         else if ((-pRy <= -20) && (-pRy <= *precValueRY) && (-pRy > -600)) {
-            rotationY = j;
             j = j + 3;
-            updateGL();
         }
     }
 
@@ -610,29 +529,25 @@ void My3DScene :: mouse3DMove(SiSpwEvent* pEvent)
     //--------------------------RZ-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((k > -360) && (k < 360)) {
-        //glRotatef(k, 0.0, 0.0, 1.0);
-        //updateGL();
+        rotationZ=k;
+        if ((-pRz > 5) || (-pRz < -5))
+            updateGL();
+        else
+            return;
+
         //Conditions de sensibilité de la souris 3D
         if ((-pRz > 5) && (-pRz >= *precValueRZ) && (-pRz < 20)) {
-            rotationZ = k;
             k = k - 1;
-            updateGL();
         }
         else if ((-pRz >= 20) && (-pRz >= *precValueRZ) && (-pRz < 600)) {
-            rotationZ = k;
             k = k - 3;
-            updateGL();
         }
 
         else if ((-pRz < -5) && (-pRz <= *precValueRZ) && (-pRz > -20)) {
-            rotationZ = k;
             k = k + 1;
-            updateGL();
         }
         else if ((-pRz <= -20) && (-pRz <= *precValueRZ) && (-pRz > -600)) {
-            rotationZ = k;
             k = k + 3;
-            updateGL();
         }
     }
 
@@ -651,10 +566,22 @@ void My3DScene :: mouse3DMove(SiSpwEvent* pEvent)
     *precValueRZ = -pRz;
 
 
-    //Ajout des composants à la scène
-    //scene.addComponent(this->SceneTransform);
-    
-}*/
+
+}
+
+//------------------------------------------------------------------------------
+//--- Constructors -------------------------------------------------------------
+//------------------------------------------------------------------------------
+My3DScene::My3DScene()
+{
+    init();
+    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+    this->rotationX = 0;
+    this->rotationY = 0;
+    this->rotationZ = 0;
+}
+
+
 
 /*--------------------------------------------------------------------------
 * Fonction : Recentrer()

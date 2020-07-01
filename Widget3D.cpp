@@ -170,7 +170,7 @@ void Widget3D::bloquer() {
 * Valeur retournée : aucune
 *--------------------------------------------------------------------------*/
 void Widget3D::Actu3D() {
-   // Visualisation3D->mouse3DMove();
+   Visualisation3D->mouse3DMove();
 }
 
 /*--------------------------------------------------------------------------
@@ -252,7 +252,7 @@ Widget3D::Widget3D()
     //Appel des fonctions toutes les 10ms
     timer = new QTimer();
 
-    //connect(timer, SIGNAL(timeout()), this, SLOT(Actu3D()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(Actu3D()));
     connect(timer, SIGNAL(timeout()), this, SLOT(DoubleClics3D()));
     connect(timer, SIGNAL(timeout()), this, SLOT(ClicDroit3D()));
     connect(timer, SIGNAL(timeout()), this, SLOT(ClicGauche3D()));
