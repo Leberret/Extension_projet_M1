@@ -1774,8 +1774,8 @@ void Interface::GestionImagesLignes(int NumeroImage)
     if (*Mode == 0)
     {
 
-        imageLabel2->setPixmap(QPixmap::fromImage(dest)); //Ajoute au layout
-        imageLabel2->setMaximumSize(Rimage.cols, Rimage.rows);
+        imageLabel2->setPixmap(QPixmap::fromImage(dest).scaled(QSize(*NbFichiers*(int)facteur, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
+        imageLabel2->setMaximumSize(*NbFichiers * (int)facteur, c);
         layout->addWidget(imageLabel2, 1, 1, Qt::AlignHCenter);//Ajout du layout à l'image
     }
 
@@ -1907,8 +1907,8 @@ void Interface::GestionImagesColonnes(int NumeroImage)
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
     {
-        imageLabel3->setPixmap(QPixmap::fromImage(dest).scaled(QSize(Rimage.cols, Rimage.rows), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        imageLabel3->setMaximumSize(Rimage.cols, Rimage.rows);
+        imageLabel3->setPixmap(QPixmap::fromImage(dest).scaled(QSize(*NbFichiers*(int)facteur, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
+        imageLabel3->setMaximumSize(*NbFichiers * (int)facteur, c);
         layout->addWidget(imageLabel3, 1, 2, Qt::AlignHCenter);//Ajout du layout à l'image
     }
 }
