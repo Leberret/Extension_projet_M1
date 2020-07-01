@@ -170,7 +170,7 @@ void Widget3D::bloquer() {
 * Valeur retournée : aucune
 *--------------------------------------------------------------------------*/
 void Widget3D::Actu3D() {
-    Visualisation3D->mouse3DMove();
+   // Visualisation3D->mouse3DMove();
 }
 
 /*--------------------------------------------------------------------------

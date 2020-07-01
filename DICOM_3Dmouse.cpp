@@ -13,7 +13,6 @@
 //INT         Coupe, Min, Max;
 INT			mode3D;
 INT         ligne;
-INT         ligneResize;
 INT         colonne;
 qint16*     NbFichiers;
 qint16*     NbCouleurs;
@@ -334,6 +333,9 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     IntensiteMaxInitCoupe2 = new qint16;
     IntensiteMaxInitCoupe3 = new qint16;
 
+    //Initialisation de la variable globale de ligneResize
+    //ligneResize = new qint16;
+
     //Initialisation des variables globales de l'intensité variables de chaque images
     IntensiteVariableCoupe1 = new qint16;
     IntensiteVariableCoupe2 = new qint16;
@@ -362,9 +364,7 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     Listechemin = new QStringList();//Liste de QString
 
     //Initialisation du vecteur contenant tous les pixels
-    //allpixels = new QVector < QVector<Vec3b>>;
     allpixels = new QVector < unsigned short>;
-    //ImgVec = new QVector<Vec3b>;
 
 
     //Stockage des chemins de fichier
@@ -482,22 +482,13 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
 
         if (NbFichier == (*NbFichiers / 4)) {
             EcartPixel = SpaceList[0].toFloat();
-            /*QMessageBox msg;
-            msg.setText(SpaceList[0]);
-            msg.exec();*/
+
         }
-
-
-
-        
-
-
-        //*allpixels.reserve(colonne * ligne * (*NbFichiers));
 
         pixels = readPixels(dataDcm); //Lecture des pixesls
         allpixels=ALLPixelsFunc(pixels,allpixels); //Tous les pixels stockés dans un vecteur
-        //vector<vector<unsigned short>> pixels_color;
-        //ImgVec=VectorImages(allpixels, ImgVec,NbFichier);
+
+
         //Libération de la mémoire
         delete(dataDcm);
         delete(pixels);
@@ -509,11 +500,8 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     delete Chargement;
     
     EcartCoupe = fabs(PositionsVector[1]- PositionsVector[0]);
-    int arrondie = round(EcartCoupe);
-    QString affiche = QString::number(arrondie);
-    QMessageBox msg;
-    msg.setText(affiche);
-    msg.exec();
+
+    float facteur = round(EcartCoupe * (1 / EcartPixel));
 
     //-----------------------Paramétrage et positionnement des outils------------------------
     SpinBox1->setButtonSymbols(QSpinBox::NoButtons);
@@ -717,6 +705,9 @@ void Interface::MajClicCoupe2(QMouseEvent* e)
     int NouvelleImageCoupe1;
     int NouvelleImageCoupe3;
 
+    float facteur = round(EcartCoupe * (1 / EcartPixel));
+
+
     //Récupération des coordonées du clic
     QPoint PositionClic = e->pos();
     int posi_x = PositionClic.x();
@@ -730,9 +721,9 @@ void Interface::MajClicCoupe2(QMouseEvent* e)
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
 
-        tailleLimite_X = (label_x + *NbFichiers);
-        tailleLimite_Y = (label_y + ligneResize);
-        NouvelleImageCoupe1 = (posi_x - label_x);
+        tailleLimite_X = (label_x + *NbFichiers*((int)facteur));
+        tailleLimite_Y = (label_y + ligne);
+        NouvelleImageCoupe1 =(posi_x - label_x)/ (int)facteur;
         NouvelleImageCoupe3 = (posi_y - label_y);
       
         //Conditon tant qu'on clic sur l'image
@@ -772,6 +763,9 @@ void Interface::MajClicCoupe3(QMouseEvent* e)
     int NouvelleImageCoupe1;
     int NouvelleImageCoupe2;
 
+    float facteur = round(EcartCoupe * (1 / EcartPixel));
+
+
     //Récupération des coordonées du clic
     QPoint PositionClic = e->pos();
     int posi_x = PositionClic.x();
@@ -785,9 +779,9 @@ void Interface::MajClicCoupe3(QMouseEvent* e)
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
 
-        tailleLimite_X = (label_x + *NbFichiers);
-        tailleLimite_Y = (label_y + ligneResize);
-        NouvelleImageCoupe1 = (posi_x - label_x);
+        tailleLimite_X = (label_x + *NbFichiers * ((int)facteur));
+        tailleLimite_Y = (label_y + ligne);
+        NouvelleImageCoupe1 = (int)((posi_x - label_x)/(int)facteur);
         NouvelleImageCoupe2 = (posi_y - label_y);
         
         //Conditon tant qu'on clic sur l'image
@@ -1677,14 +1671,11 @@ void Interface::GestionImagesLignes(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     Mat image = Mat::zeros(*NbFichiers - 1, colonne, CV_8UC1);//Image de la taille obtenue avec data
-    //vector<Mat> planes;    
     
     //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
-    // Séparation des canaux d'une image.
-    //split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
-    // Green et Red.
+
 
     //Initialisation de l'intensité max
     int valMax = 0;//locale
@@ -1725,31 +1716,22 @@ void Interface::GestionImagesLignes(int NumeroImage)
             if (valMax == 0) { //On évite la division par 0
                 //Association de la valeur au bon endroit de l'image
                 image.at<unsigned char>(i, j) = Valeurdefinitif[k];
-
-                /*planes[0].at<unsigned short>(i, j) = (*allpixels)[k][0];
-                planes[1].at<unsigned short>(i, j) = (*allpixels)[k][1];
-                planes[2].at<unsigned short>(i, j) = (*allpixels)[k][2];*/
             }
             else {//Normalisation de l'image sur une échelle 0-255
                 //Association de la valeur au bon endroit de l'image
                 image.at<unsigned char>(i, j) = (Valeurdefinitif[k] * 255) / valMax;
-
-                /*planes[0].at<unsigned short>(i, j) = ((*allpixels)[k][0] * 255) / valMax;
-                planes[1].at<unsigned short>(i, j) = ((*allpixels)[k][1] * 255) / valMax;
-                planes[2].at<unsigned short>(i, j) = ((*allpixels)[k][2] * 255) / valMax;*/
             }
             k++; //Décalage d'une valeur dans le vecteur global
         }
     }
-    //merge(planes, image);
+
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
     float facteur = round(EcartCoupe * (1 / EcartPixel));
-    ligneResize = (int)facteur*l;
-    Mat Rimage = Mat(ligneResize, c, CV_8UC1);
+
+    Mat Rimage = Mat(*NbFichiers * ((int)facteur), c, CV_8UC1);
     cv::resize(image, Rimage, Rimage.size());
-    //Mat blurredImage;
-    //GaussianBlur(Rimage, Rimage, Size(9, 9), 1.0);
+
 
     //Application de la couleur et convertion en format adapté
     switch (*NbCouleurs)
@@ -1786,23 +1768,14 @@ void Interface::GestionImagesLignes(int NumeroImage)
         dest = QImage((uchar*)Rimage.data, Rimage.cols, Rimage.rows, Rimage.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     }
-    /*
-    //Changement de la longueur des colonnes et des lignes
-    if (l < 400 && c < 400) //Si image de petite taille
-    {
-        l = 1.75 * l;//Coeff de 1.75
-        c = 1.75 * c;//Coeff de 1.75
-    }*/
-    
-
+   
 
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
     {
-        //SpinBox2->setValue(slider2->value());
 
-        imageLabel2->setPixmap(QPixmap::fromImage(dest).scaled(QSize(ligneResize, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        imageLabel2->setMaximumSize(ligneResize, c);
+        imageLabel2->setPixmap(QPixmap::fromImage(dest)); //Ajoute au layout
+        imageLabel2->setMaximumSize(Rimage.cols, Rimage.rows);
         layout->addWidget(imageLabel2, 1, 1, Qt::AlignHCenter);//Ajout du layout à l'image
     }
 
@@ -1880,10 +1853,9 @@ void Interface::GestionImagesColonnes(int NumeroImage)
     //Rotation de 90° de l'image
     rotate(image, image, cv::ROTATE_90_CLOCKWISE);
 
+    float facteur = round(EcartCoupe * (1 / EcartPixel));
 
-    float facteur = round(EcartCoupe *(1/EcartPixel));
-    ligneResize = (int)facteur * l;
-    Mat Rimage = Mat(ligneResize, c, CV_8UC1);
+    Mat Rimage = Mat(*NbFichiers * ((int)facteur), c, CV_8UC1);
     cv::resize(image, Rimage, Rimage.size());
 
 
@@ -1935,8 +1907,8 @@ void Interface::GestionImagesColonnes(int NumeroImage)
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
     {
-        imageLabel3->setPixmap(QPixmap::fromImage(dest).scaled(QSize(ligneResize, c), Qt::IgnoreAspectRatio)); //Ajoute au layout
-        imageLabel3->setMaximumSize(ligneResize, c);
+        imageLabel3->setPixmap(QPixmap::fromImage(dest).scaled(QSize(Rimage.cols, Rimage.rows), Qt::IgnoreAspectRatio)); //Ajoute au layout
+        imageLabel3->setMaximumSize(Rimage.cols, Rimage.rows);
         layout->addWidget(imageLabel3, 1, 2, Qt::AlignHCenter);//Ajout du layout à l'image
     }
 }
@@ -2064,7 +2036,7 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     imageLabel1 = new QLabel(); //init label
     imageLabel2 = new QLabel();//init label
     imageLabel3 = new QLabel();//init label
-    //imageLabel4 = new QLabel(); //init label
+    imageLabel4 = new QLabel(); //init label
     //imageLabel5 = new QLabel();//init label
     //imageLabel6 = new QLabel();//init label
 
@@ -2145,8 +2117,8 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
         "selection-background-color:rgb(230,230,230) ;");
     //Ajout du menu au layout
     layout->setMenuBar(menu);
-    imageLabel1->setPixmap(QPixmap::fromImage(QImage("icon.png")).scaled(QSize(100, 100), Qt::IgnoreAspectRatio)); //Ajoute au layout
-    layout->addWidget(imageLabel1);//Ajout du layout à l'image
+    imageLabel4->setPixmap(QPixmap::fromImage(QImage("icon.png")).scaled(QSize(100, 100), Qt::IgnoreAspectRatio)); //Ajoute au layout
+    layout->addWidget(imageLabel4);//Ajout du layout à l'image
     //Paramétrage du layout
     layout->setAlignment(Qt::AlignHCenter);//Centrage de tous les éléments du layout
     setWindowState(windowState() | Qt::WindowMaximized);//Fenetre en plein ecran

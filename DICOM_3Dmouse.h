@@ -93,7 +93,7 @@ private:
 	QLabel* imageLabel1;
 	QLabel* imageLabel2;
 	QLabel* imageLabel3;
-	//QLabel* imageLabel4;
+	QLabel* imageLabel4;
 	//QLabel* imageLabel5;
 	//QLabel* imageLabel6;
 	QString* pathFolder;
@@ -123,6 +123,8 @@ private:
 	qint16* IntensiteVariableCoupe2;
 	qint16* IntensiteMaxInitCoupe3;
 	qint16* IntensiteVariableCoupe3;
+	//qint16* ligneResize;
+
 	qint16* visible;
 	qint16* lastTxValue;
 	qint16* NumImageTx;
