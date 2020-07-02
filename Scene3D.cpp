@@ -2,13 +2,12 @@
  * @Authors: LE FUR Anthony / LE BERRE Thomas
  * @Company: ISEN Yncréa Ouest
  * @Email: anthony.le-fur@isen-ouest.yncrea.fr / thomas.le-berre@isen-ouest.yncrea.fr
- * @Last Modified: 30-Apr-2020
+ * @Last Modified: 02-Juil-2020
  */
 
 #include "Scene3D.h"
 #include "DICOM_3Dmouse.h"
 #include "Widget3D.h"
-
 
 
 /*--------------------------------------------------------------------------
@@ -59,9 +58,15 @@ void My3DScene::init() {
     *compteurRZ = 0;
 }
 
-
-
-
+/*--------------------------------------------------------------------------
+* Fonction : initializeGL()
+*
+* Description : Initialisation de la fenêtre OpenGL et reconstruction 3D
+*
+* Arguments : Aucun
+*
+* Valeur retournée : Aucune
+*--------------------------------------------------------------------------*/
 void My3DScene::initializeGL()
 {
     glClearColor(0, 0, 0, 1.0);
@@ -74,32 +79,17 @@ void My3DScene::initializeGL()
 
     QVector<Vec3b>* imgs = VectorImages(allpixels);
 
-
     //Création barre de chargement de la reconstruction 3D
     QProgressDialog Chargement ("Reconstruction 3D", "Cancel", 0, *NbFichiers);//Paramètres de la barre
     Chargement.setWindowTitle("Chargement");
     Chargement.setWindowModality(Qt::WindowModal);
     Chargement.setMinimumDuration(5);//Pas de temps mini de chargement
 
-    // compile the display list, store a triangle in it
+    //Compiler la liste d'affichage, y stocker la reconstruction 3D
     glNewList(1, GL_COMPILE);
     
     float f = round(EcartCoupe*(1/EcartPixel));
-    /*static const GLfloat coords[6][4][3] =
-    {
-      { { +1.0, -1.0, +1.0 }, { +1.0, -1.0, -1.0 },
-      { +1.0, +1.0, -1.0 }, { +1.0, +1.0, +1.0 } },//face de droite
-      { { -1.0, -1.0, -1.0 }, { -1.0, -1.0, +1.0 },
-      { -1.0, +1.0, +1.0 }, { -1.0, +1.0, -1.0 } },//face de gauche
-      { { +1.0, -1.0, -1.0 }, { -1.0, -1.0, -1.0 },
-      { -1.0, +1.0, -1.0 }, { +1.0, +1.0, -1.0 } },//face avant
-      { { -1.0, -1.0, +1.0 }, { +1.0, -1.0, +1.0 },
-      { +1.0, +1.0, +1.0 }, { -1.0, +1.0, +1.0 } },//face arrière
-      { { -1.0, -1.0, -1.0 }, { +1.0, -1.0, -1.0 },
-      { +1.0, -1.0, +1.0 }, { -1.0, -1.0, +1.0 } },//face du bas
-      { { -1.0, +1.0, +1.0 }, { +1.0, +1.0, +1.0 },
-      { +1.0, +1.0, -1.0 }, { -1.0, +1.0, -1.0 } }///face du haut
-    };*/
+
     static const GLfloat coords[6][4][3] =
     {
       { { +1.0, -1.0, +f }, { +1.0, -1.0, -f },
@@ -116,7 +106,17 @@ void My3DScene::initializeGL()
       { +1.0, +1.0, -f }, { -1.0, +1.0, -f } }///face du haut
     };
     
-    int k = 0*colonne*ligne;
+    //Valeurs seuils
+    int BackColorB=(*imgs)[0][0]+40;
+    int BackColorG = (*imgs)[0][1] + 40;
+    int BackColorR = (*imgs)[0][2] + 40;
+
+
+    //int Milieu = (int)((Max - Min) / 2);
+
+
+    //Reconstruction 3D
+    int k = 0;
     for (int z = 0; z < *NbFichiers; z++) {
 
         for (int y = 0; y < ligne; y++) {
@@ -124,21 +124,21 @@ void My3DScene::initializeGL()
             for (int x = 0; x < colonne; x++)
             {
                 Vec3b pixel = (*imgs)[k];
-                if ((pixel[0] > 40) || (pixel[1] > 40) || (pixel[2] > 40)) {
+                if ((pixel[0] > BackColorB) || (pixel[1] > BackColorG) || (pixel[2] > BackColorR)) {
                     if ((k < colonne * ligne * 1) || (k > colonne * ligne * (*NbFichiers - 1))) {
                         for (int i = 0; i < 6; i++)
                         {
                             glBegin(GL_QUADS);
                             for (int j = 0; j < 4; j++)
                             {
-                                glColor4b(pixel[2], pixel[1], pixel[0], 100);
+                                glColor4b(pixel[2], pixel[1], pixel[0], 10);
                                 glVertex3f((coords[i][j][0] + x)/2, (coords[i][j][1] + y)/2, (coords[i][j][2] + f*z)/2);
                             }
                             glEnd();
                         }
                     }
 
-                    else if ((((*imgs)[k + 1][0] < 40)&&((*imgs)[k + 1][1] < 40)&&((*imgs)[k + 1][2] < 40)) || (((*imgs)[k - 1][0] < 40)&& ((*imgs)[k - 1][1] < 40)&& ((*imgs)[k - 1][2] < 40)) || (((*imgs)[k + colonne][0] < 40)&&((*imgs)[k + colonne][1] < 40)&& ((*imgs)[k + colonne][2] < 40)) || (((*imgs)[k - colonne][0] < 40)&& ((*imgs)[k - colonne][1] < 40)&& ((*imgs)[k - colonne][2] < 40)) || (((*imgs)[k + ligne * colonne][0] < 40)&& ((*imgs)[k + ligne * colonne][1] < 40)&& ((*imgs)[k + ligne * colonne][2] < 40)) || (((*imgs)[k - ligne * colonne][0] < 40)&& ((*imgs)[k - ligne * colonne][1] < 40)&& ((*imgs)[k - ligne * colonne][2] < 40))) {
+                    else if ((((*imgs)[k + 1][0] < BackColorB)&&((*imgs)[k + 1][1] < BackColorG)&&((*imgs)[k + 1][2] < BackColorR)) || (((*imgs)[k - 1][0] < BackColorB)&& ((*imgs)[k - 1][1] < BackColorG)&& ((*imgs)[k - 1][2] < BackColorR)) || (((*imgs)[k + colonne][0] < BackColorB)&&((*imgs)[k + colonne][1] < BackColorG)&& ((*imgs)[k + colonne][2] < BackColorR)) || (((*imgs)[k - colonne][0] < BackColorB)&& ((*imgs)[k - colonne][1] < BackColorG)&& ((*imgs)[k - colonne][2] < BackColorR)) || (((*imgs)[k + ligne * colonne][0] < BackColorB)&& ((*imgs)[k + ligne * colonne][1] < BackColorG)&& ((*imgs)[k + ligne * colonne][2] < BackColorR)) || (((*imgs)[k - ligne * colonne][0] < BackColorB)&& ((*imgs)[k - ligne * colonne][1] < BackColorG)&& ((*imgs)[k - ligne * colonne][2] < BackColorR))) {
                         for (int i = 0; i < 6; i++)
                         {
                             glBegin(GL_QUADS);
@@ -150,9 +150,8 @@ void My3DScene::initializeGL()
                             glEnd();
                         }
                     }
+
                 }
-                
-                
                 k++;
             }
         }
@@ -165,6 +164,15 @@ void My3DScene::initializeGL()
     glEndList();
 }
 
+/*--------------------------------------------------------------------------
+* Fonction : resizeGL()
+*
+* Description : Gestion de la zone de visualisation 3D
+*
+* Arguments : Aucun
+*
+* Valeur retournée : Aucune
+*--------------------------------------------------------------------------*/
 void My3DScene::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -175,6 +183,15 @@ void My3DScene::resizeGL(int width, int height)
     glMatrixMode(GL_MODELVIEW);
 }
 
+/*--------------------------------------------------------------------------
+* Fonction : paintGL()
+*
+* Description : Translation et rotation de la reconstruction 3D
+*
+* Arguments : Aucun
+*
+* Valeur retournée : Aucune
+*--------------------------------------------------------------------------*/
 void My3DScene::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -182,15 +199,15 @@ void My3DScene::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    //glTranslatef(0.0, 0.0, zoomZ-3000.0);
     glTranslatef(TranslationX, TranslationY, zoomZ - 3000.0);
+    glTranslatef(colonne / 2, ligne / 2, *NbFichiers / 2);
     glRotatef(rotationX, 1.0, 0.0, 0.0);
     glRotatef(rotationY, 0.0, 1.0, 0.0);
     glRotatef(rotationZ, 0.0, 0.0, 1.0);
+    glTranslatef(-colonne / 2, -ligne / 2, -*NbFichiers / 2);
  
     glCallList(1);
 }
-
 
 /*--------------------------------------------------------------------------
 * Fonction : mousePressEvent()
@@ -223,7 +240,7 @@ void My3DScene::mouseMoveEvent(QMouseEvent* event)
 
     if (event->buttons() & Qt::LeftButton)
     {
-        rotationX += 180 * dy;
+        zoomZ += 1800 * dy;
         rotationY += 180 * dx;
         updateGL();
     }
@@ -237,7 +254,15 @@ void My3DScene::mouseMoveEvent(QMouseEvent* event)
     lastPosition = event->pos();
 }
 
-
+/*--------------------------------------------------------------------------
+* Fonction : VectorImages()
+*
+* Description : Stockages de tous les pixels de chaque image dans un QVector sous forme de Vec3b
+*
+* Arguments : *all : vecteur contenant la valeur de tous les pixels de toutes images à la suite
+*
+* Valeur retournée : ImgVec : vecteur contenant la valeur de tous les pixels de toutes images à la suite sous forme de Vec3b
+*--------------------------------------------------------------------------*/
 QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
 
     //Barre de chargement
@@ -306,7 +331,6 @@ QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
 
     return ImgVec;
 }
-
 
 /*--------------------------------------------------------------------------
 * Fonction : mouse3DMove()
@@ -517,25 +541,10 @@ void My3DScene::mouse3DMove()
 
 }
 
-//------------------------------------------------------------------------------
-//--- Constructors -------------------------------------------------------------
-//------------------------------------------------------------------------------
-My3DScene::My3DScene()
-{
-    init();
-    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
-    this->rotationX = 0;
-    this->rotationY = 0;
-    this->rotationZ = 0;
-    this->zoomZ = 0;
-}
-
-
-
 /*--------------------------------------------------------------------------
 * Fonction : Recentrer()
 *
-* Description : Recentrer l'objet 3D et la caméra
+* Description : Recentrer l'objet 3D
 *
 * Arguments : Aucun
 *
@@ -543,7 +552,10 @@ My3DScene::My3DScene()
 *--------------------------------------------------------------------------*/
 void My3DScene::Recentrer()
 {
-    //this->camera()->setViewCenter(QVector3D(0.0, 0.0, 0.0));//Position initiale
+    TranslationX = 0;
+    TranslationY = 0;
+    zoomZ = 0;
+    updateGL();
     *compteurTX = 0;
     *compteurTY = 0;
     *compteurTZ = 0;
@@ -552,7 +564,7 @@ void My3DScene::Recentrer()
 /*--------------------------------------------------------------------------
 * Fonction : BloquerScene()
 *
-* Description : Recentrer l'objet 3D et la caméra et le vérouiller au centre
+* Description : Recentrer l'objet 3D et le vérouiller au centre
 *
 * Arguments : Aucun
 *
@@ -560,9 +572,28 @@ void My3DScene::Recentrer()
 *--------------------------------------------------------------------------*/
 void My3DScene::BloquerScene()
 {
-    //this->camera()->setViewCenter(QVector3D(0.0, 0.0, 0.0));//Position initiale
+    TranslationX = 0;
+    TranslationY = 0;
+    updateGL();
     *compteurTX = 0;
     *compteurTZ = 0;
 }
+
+//------------------------------------------------------------------------------
+//--- Constructors -------------------------------------------------------------
+//------------------------------------------------------------------------------
+My3DScene::My3DScene()
+{
+    init();
+    setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+    this->TranslationX = 0;
+    this->TranslationY = 0;
+    this->zoomZ = 0;
+    this->rotationX = 0;
+    this->rotationY = 0;
+    this->rotationZ = 0;
+}
+
+
 
 

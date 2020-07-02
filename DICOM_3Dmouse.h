@@ -54,7 +54,6 @@ public slots:
 	void DoubleClics();
 	void ClicGauche();
 	void SaveAs();
-	void Detourage();
 	void UtiliserSouris3D();
 	void AffichageOriginal();
 	void AffichageJet();
@@ -93,7 +92,6 @@ private:
 	QLabel* imageLabel1;
 	QLabel* imageLabel2;
 	QLabel* imageLabel3;
-	QLabel* imageLabel4;
 	QString* pathFolder;
 	QString* pathFolderSave;
 	QGridLayout* layout;

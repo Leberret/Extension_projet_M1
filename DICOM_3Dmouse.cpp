@@ -2,7 +2,7 @@
  * @Authors: LE FUR Anthony / LE BERRE Thomas
  * @Company: ISEN Yncréa Ouest
  * @Email: anthony.le-fur@isen-ouest.yncrea.fr / thomas.le-berre@isen-ouest.yncrea.fr
- * @Last Modified: 30-Apr-2020
+ * @Last Modified: 02-Juil-2020
  */
 
 #include "DICOM_3Dmouse.h"
@@ -1398,7 +1398,6 @@ void Interface::SaveAs() {
     //Initialisation de la hauteur des images
     int tailleLimite_Y;
 
-
     //Récupération des coordonées de la SpinBox1
     QPoint coords = SpinBox1->pos();
     int spinbox_y = coords.y();
@@ -1407,14 +1406,7 @@ void Interface::SaveAs() {
     QPoint coord3 = imageLabel3->pos();
     int label3_y = coord3.y();
 
-    if (ligne < 400 && colonne < 400) //Si image de petite taille
-    {
-        //facteur 1.75 pour prendre en compte le zoom
-        tailleLimite_Y = (label3_y + ligne * 1.75);
-    }
-    else { //Si grande image
-        tailleLimite_Y = (label3_y + ligne);
-    }
+    tailleLimite_Y = (label3_y + ligne);
 
     //définition de la hauteur et de la largeur de capture
     int hauteur_capture = tailleLimite_Y - spinbox_y;
@@ -1427,17 +1419,6 @@ void Interface::SaveAs() {
 
     //Sauvegarde de l'image
     pixmap.save(filePath);
-
-}
-
-
-void Interface::Detourage() {
-    //Création d'un image vide de la taille obtenue dans OuvrirFichier
-    Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
-
-    //Mise en local des dimensions de l'image recréée
-    int l = image.rows;
-    int c = image.cols;
 
 }
 
@@ -1947,7 +1928,6 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     imageLabel1 = new QLabel(); //init label
     imageLabel2 = new QLabel();//init label
     imageLabel3 = new QLabel();//init label
-    imageLabel4 = new QLabel(); //init label
 
     slider1 = new QSlider(Qt::Horizontal);//init curseur
     slider2 = new QSlider(Qt::Horizontal);//init curseur
@@ -2024,8 +2004,8 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
         "selection-background-color:rgb(230,230,230) ;");
     //Ajout du menu au layout
     layout->setMenuBar(menu);
-    imageLabel4->setPixmap(QPixmap::fromImage(QImage("icon.png")).scaled(QSize(100, 100), Qt::IgnoreAspectRatio)); //Ajoute au layout
-    layout->addWidget(imageLabel4);//Ajout du layout à l'image
+    imageLabel1->setPixmap(QPixmap::fromImage(QImage("icon.png")).scaled(QSize(100, 100), Qt::IgnoreAspectRatio)); //Ajoute au layout
+    layout->addWidget(imageLabel1);//Ajout du layout à l'image
     //Paramétrage du layout
     layout->setAlignment(Qt::AlignHCenter);//Centrage de tous les éléments du layout
     setWindowState(windowState() | Qt::WindowMaximized);//Fenetre en plein ecran

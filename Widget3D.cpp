@@ -2,7 +2,7 @@
  * @Authors: LE FUR Anthony / LE BERRE Thomas
  * @Company: ISEN Yncréa Ouest
  * @Email: anthony.le-fur@isen-ouest.yncrea.fr / thomas.le-berre@isen-ouest.yncrea.fr
- * @Last Modified: 30-Apr-2020
+ * @Last Modified: 02-Juil-2020
  */
 
 #include "DICOM_3Dmouse.h"
@@ -84,7 +84,7 @@ void Widget3D::ClicGauche3D() {
 }
 
 /*--------------------------------------------------------------------------
-* Fonctions : SaveAs()
+* Fonctions : SaveAs3D()
 *
 * Description : Permet de screenshoter l'interafce de reconstruction 3D
 *
@@ -94,10 +94,6 @@ void Widget3D::ClicGauche3D() {
 *--------------------------------------------------------------------------*/
 void Widget3D::SaveAs3D() {
     qApp->beep(); // Signal the screenshoot
-
-        //Initialisation de la hauteur des images
-    int tailleLimite_Y;
-
 
     //Récupération des coordonées du container contenant la Scene 3D
     QPoint coord = container->pos();
@@ -227,15 +223,10 @@ Widget3D::Widget3D()
     //Conversion de la Scene3d en QWidget et fixation de sa taille
     QHBoxLayout* container = new QHBoxLayout;
     container->addWidget(Visualisation3D);
-    //layout->addWidget(Visualisation3D,2,1,1,1);
-
-    //slider = new QSlider(Qt::Horizontal);//init curseur
-    //slider->setRange(0, *NbFichiers - 1);
-    //layout->addWidget(slider, Qt::AlignBottom);
-
 
     QWidget* w = new QWidget;
     w->setLayout(container);
+
     //Ajout des composants à leurs entités
     menu->addMenu(Fichier);
     menu->addMenu(Affichage);    
