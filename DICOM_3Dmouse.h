@@ -94,8 +94,6 @@ private:
 	QLabel* imageLabel2;
 	QLabel* imageLabel3;
 	QLabel* imageLabel4;
-	//QLabel* imageLabel5;
-	//QLabel* imageLabel6;
 	QString* pathFolder;
 	QString* pathFolderSave;
 	QGridLayout* layout;
@@ -109,22 +107,15 @@ private:
 	QMenu* Info;
 	QMenu* Outils;
 	QStringList* Listechemin;
-	//QVector<unsigned short>* allpixels;
 	QSpinBox* SpinBox1;
 	QSpinBox* SpinBox2;
 	QSpinBox* SpinBox3;
-	//qint16* cols;
-	//qint16* rows;
-	//qint16* NbFichiers;
-	//qint16* NbCouleurs;
 	qint16* IntensiteMaxInitCoupe1;
 	qint16* IntensiteVariableCoupe1;
 	qint16* IntensiteMaxInitCoupe2;
 	qint16* IntensiteVariableCoupe2;
 	qint16* IntensiteMaxInitCoupe3;
 	qint16* IntensiteVariableCoupe3;
-	//qint16* ligneResize;
-
 	qint16* visible;
 	qint16* lastTxValue;
 	qint16* NumImageTx;
@@ -142,22 +133,5 @@ private:
 	qint16* coupe;
 	qint16* IntensiteOnOff;
 
-	//-----------------interface Affichage3D--------------------------
-	QWidget* WidgetAppercu3D;
-	QLabel* LabelVisuImage;
-	QLabel* LabelSaisieMin;
-	QLabel* LabelSaisieMax;
-	QLabel* LabelSliderIntensite;
-	QLabel* LabelSliderTransparence;
-	QGridLayout* LayoutVisuImage;
-	QSlider* SliderVisuIntensite;
-	QSlider* SliderVisuTransparence;
-	QLineEdit* LineEditSaisieMin;
-	QLineEdit* LineEditSaisieMax;
-	qint16* imageMax;
-	qint16* imageMin;
-	qint16* CoupeVisu;
-	QPushButton* validerVisu;
-	QComboBox* comboBoxVisu;
 };
 

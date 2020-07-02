@@ -10,7 +10,6 @@
 #include "Widget3D.h"
 
 //Initialisation des variables globales
-//INT         Coupe, Min, Max;
 INT			mode3D;
 INT         ligne;
 INT         colonne;
@@ -20,7 +19,6 @@ QVector<unsigned short>* allpixels;
 FLOAT       EcartCoupe;
 FLOAT       EcartPixel;
 
-//QVector<Vec3b>* ImgVec;
 /*--------------------------------------------------------------------------
 * Fonction : ALLPixelsFunc()
 *
@@ -30,95 +28,13 @@ FLOAT       EcartPixel;
 *             *all : vecteur contenant la valeur de tous les pixels de toutes images à la suite
 *
 * Valeur retournée : *all
-*--------------------------------------------------------------------------*/
-/*QVector<QVector<Vec3b>>* Interface::ALLPixelsFunc(vector<unsigned short> *pixels, QVector<QVector<Vec3b>>*allpixels)
-{
-
-    //QVector<unsigned short>pixel_color(3);
-    Vec3b pixel_color;
-    QVector<Vec3b>img(colonne*ligne);
-
-    for (auto pixel : *pixels){//int k = 0; k < taille; k++) {
-        //*allpixels[k].reserve(3);
-        //pixel_color[0]=(*pixels)[k]; //Remplissage du vecteur avec les valeurs des pixels
-        pixel_color[0] = (unsigned short)pixel; //Remplissage du vecteur avec les valeurs des pixels
-        pixel_color[1] = (unsigned short)pixel; //Remplissage du vecteur avec les valeurs des pixels
-        pixel_color[2] = (unsigned short)pixel; //Remplissage du vecteur avec les valeurs des pixels
-        img.push_back(pixel_color);
-        allpixels->push_back(img);
-    }
-    QMessageBox ErreurDossier;
-    ErreurDossier.setWindowTitle("ATTENTION");
-    ErreurDossier.setWindowIcon(QIcon("icon.png"));
-    ErreurDossier.setIcon(QMessageBox::Warning);
-    ErreurDossier.setText("pb apres !!!");
-    ErreurDossier.exec();
-    return allpixels;
-} */  
-
+*--------------------------------------------------------------------------*/ 
 QVector<unsigned short>* Interface::ALLPixelsFunc(vector<unsigned short>* pixels, QVector<unsigned short>* allpixels)
 {
     for (auto pixel : *pixels)
         allpixels->push_back(pixel); //Remplissage du vecteur avec les valeurs des pixels
     return allpixels;
 }
-
-/*QVector<Vec3b>* Interface::VectorImages(QVector<unsigned short>* all, QVector<Vec3b>* ImgVec, int NbFichier) {
-
-    //Création d'un image vide de la taille obtenue dans OuvrirFichier
-    Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
-    int k = NbFichier*ligne*colonne;
-    for (int y = 0; y < ligne; y++)
-    {
-        for (int x = 0; x < colonne; x++)
-        {
-            // get pixel 
-            image.at<uchar>(y, x) = (*all)[k];
-            k++;
-        }
-    }
-    //Mat image;// = Mat::zeros(ligne, colonne, CV_16UC3);
-
-
-    //Application de la couleur et convertion en format adapté
-    switch (*NbCouleurs)
-    {
-    case 0:
-        cvtColor(image, image, COLOR_GRAY2BGR);
-        break;
-    case 1:
-        applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
-        break;
-    case 2:
-        applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
-        break;
-    case 3:
-        applyColorMap(image, image, COLORMAP_CIVIDIS);//Application de la couleur a l'image
-        break;
-    case 4:
-        applyColorMap(image, image, COLORMAP_TURBO);//Application de la couleur a l'image
-        break;
-    case 5:
-        applyColorMap(image, image, COLORMAP_HOT);//Application de la couleur a l'image
-        break;
-    case 6:
-        applyColorMap(image, image, COLORMAP_PARULA);//Application de la couleur a l'image
-        break;
-    case 7:
-        applyColorMap(image, image, COLORMAP_TWILIGHT_SHIFTED);//Application de la couleur a l'image
-        break;
-    }
-
-    //QVector<Vec3b> pixels;
-
-    MatIterator_<Vec3b> it, end;
-    for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it)
-    {
-        ImgVec->push_back(*it);
-    }
-
-    return ImgVec;
-}*/
 
 /*--------------------------------------------------------------------------
 * Fonction : Affichage3D()
@@ -705,8 +621,8 @@ void Interface::MajClicCoupe2(QMouseEvent* e)
     int NouvelleImageCoupe1;
     int NouvelleImageCoupe3;
 
+    //Facteur de déformation
     float facteur = round(EcartCoupe * (1 / EcartPixel));
-
 
     //Récupération des coordonées du clic
     QPoint PositionClic = e->pos();
@@ -721,7 +637,7 @@ void Interface::MajClicCoupe2(QMouseEvent* e)
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
 
-        tailleLimite_X = (label_x + *NbFichiers*((int)facteur));
+        tailleLimite_X = (label_x + *NbFichiers*((int)facteur)); //Taille limite après déformation
         tailleLimite_Y = (label_y + ligne);
         NouvelleImageCoupe1 =(posi_x - label_x)/ (int)facteur;
         NouvelleImageCoupe3 = (posi_y - label_y);
@@ -763,8 +679,8 @@ void Interface::MajClicCoupe3(QMouseEvent* e)
     int NouvelleImageCoupe1;
     int NouvelleImageCoupe2;
 
+    //Facteur de déformation
     float facteur = round(EcartCoupe * (1 / EcartPixel));
-
 
     //Récupération des coordonées du clic
     QPoint PositionClic = e->pos();
@@ -779,7 +695,7 @@ void Interface::MajClicCoupe3(QMouseEvent* e)
     //Condition de clic sur le bouton gauche
     if (e->button() == Qt::LeftButton) {
 
-        tailleLimite_X = (label_x + *NbFichiers * ((int)facteur));
+        tailleLimite_X = (label_x + *NbFichiers * ((int)facteur)); //Taille limite après déformation
         tailleLimite_Y = (label_y + ligne);
         NouvelleImageCoupe1 = (int)((posi_x - label_x)/(int)facteur);
         NouvelleImageCoupe2 = (posi_y - label_y);
@@ -2003,9 +1919,6 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     _mkdir("Images");
 
     //Initialisation variables globales
-    imageMin = new qint16;
-    imageMax = new qint16;
-    CoupeVisu = new qint16;
     NbFichiers = new qint16;
     visible = new qint16;
     lastTxValue = new qint16;
@@ -2018,8 +1931,6 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     variationIntensite = new qint16;
     coupe = new qint16;
     Mode = new qint16;
-    //cols = new qint16;//Colones
-    //rows = new qint16;//Lignes
     souris3D = new qint16;
     MenuSouris3D = new qint16;
     OnOffIntensite = new qint16;
@@ -2037,16 +1948,12 @@ Interface::Interface() : QWidget() //Widget = fenetre principale
     imageLabel2 = new QLabel();//init label
     imageLabel3 = new QLabel();//init label
     imageLabel4 = new QLabel(); //init label
-    //imageLabel5 = new QLabel();//init label
-    //imageLabel6 = new QLabel();//init label
 
     slider1 = new QSlider(Qt::Horizontal);//init curseur
     slider2 = new QSlider(Qt::Horizontal);//init curseur
     slider3 = new QSlider(Qt::Horizontal);//init curseur
     sliderIntensite = new QSlider(Qt::Horizontal);//init curseur
 
-    
-    *CoupeVisu = 0;//Init a 0 : coupe 1
     *NbFichiers = 0; //Initialise a 0 pour ne pas avoir de pb de memoires
     *visible = 0;//NumImageTx orientation pour savoir si affichage sliderIntensite
     *souris3D = 0;

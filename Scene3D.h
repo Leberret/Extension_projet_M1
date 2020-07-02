@@ -38,7 +38,9 @@ private:
 	GLfloat rotationX;
 	GLfloat rotationY;
 	GLfloat rotationZ;
-	GLfloat zoomTy;
+	GLfloat zoomZ;
+	GLfloat TranslationX;
+	GLfloat TranslationY;
 	QPoint lastPosition;
 
 	// Private methods.

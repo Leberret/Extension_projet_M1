@@ -222,9 +222,18 @@ Widget3D::Widget3D()
     Fichier->addAction("Enregistrer sous", this, SLOT(SaveAs3D()));
     Affichage->addAction("Recentrer", this, SLOT(centrage()));
 
+    //layout = new QGridLayout;//Init layout
+
     //Conversion de la Scene3d en QWidget et fixation de sa taille
     QHBoxLayout* container = new QHBoxLayout;
     container->addWidget(Visualisation3D);
+    //layout->addWidget(Visualisation3D,2,1,1,1);
+
+    //slider = new QSlider(Qt::Horizontal);//init curseur
+    //slider->setRange(0, *NbFichiers - 1);
+    //layout->addWidget(slider, Qt::AlignBottom);
+
+
     QWidget* w = new QWidget;
     w->setLayout(container);
     //Ajout des composants à leurs entités

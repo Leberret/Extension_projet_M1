@@ -59,67 +59,7 @@ void My3DScene::init() {
     *compteurRZ = 0;
 }
 
-/*--------------------------------------------------------------------------
-* Fonction : createObjects()
-*
-* Description : Création des objets 3D constituant la scène 3D, plans 3D
-* recouverts d'une texture sur chaque face
-*
-* Arguments : Aucun
-*
-* Valeur retournée : Aucune
-*--------------------------------------------------------------------------*/
-/*void My3DScene::createObjects()
-{
-    
 
-    //for (int i = Min; i < Max; i++) {
-        
-        int c = 5;
-        int l = 5;
-        
-        int k = (colonne * ligne) * 100;
-        //int k = (c * l) * 100;
-
-        for (int i = 0; i < l; i++) {
-
-            for (int j = 0; j < c; j++)
-            {
-                //int pixel = (*allpixels)[k];
-                int pixel = 100;
-                //if (pixel > 70) {
-                    cuboid = new Qt3DExtras::QCuboidMesh();
-                    cuboid->setXExtent(1);
-                    cuboid->setYExtent(1);
-                    cuboid->setZExtent(1);
-                    cuboid->setXYMeshResolution(QSize (1,1));
-                    cuboid->setXZMeshResolution(QSize(1, 1));
-
-                    Qt3DExtras::QPhongMaterial* cuboidMaterial = new Qt3DExtras::QPhongMaterial();
-
-
-                    cuboidMaterial->setDiffuse(QColor(pixel, pixel, pixel));
-                    cuboidMaterial->setAmbient(QColor(pixel, pixel, pixel));
-
-                    cuboidTransform = new Qt3DCore::QTransform(cuboid);
-                    cuboidTransform->setTranslation(QVector3D((float)j, (float)i, 0.0));
-
-                    //Cuboid
-                    m_cuboidEntity = new Qt3DCore::QEntity(&this->scene);
-                    m_cuboidEntity->addComponent(cuboid);
-                    m_cuboidEntity->addComponent(cuboidMaterial);
-                    m_cuboidEntity->addComponent(cuboidTransform);
-                //}
-                
-
-
-                k++; //Décalage d'une valeur dans le vecteur global
-            }
-        }
-                    
-    //}
-    
-}*/
 
 
 void My3DScene::initializeGL()
@@ -129,21 +69,17 @@ void My3DScene::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_BLEND);
-    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
     glEnable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
 
     QVector<Vec3b>* imgs = VectorImages(allpixels);
 
 
-    //Création barre de chargement des images
-    /*QProgressDialog Chargement= new QProgressDialog("Reconstruction 3D", "Cancel", 0, *NbFichiers, this);//Paramètres de la barre
+    //Création barre de chargement de la reconstruction 3D
+    QProgressDialog Chargement ("Reconstruction 3D", "Cancel", 0, *NbFichiers);//Paramètres de la barre
     Chargement.setWindowTitle("Chargement");
-    Chargement.setMinimumSize(400, 50);
     Chargement.setWindowModality(Qt::WindowModal);
-    Chargement.setCancelButton(0);//Impossible d'annuler
-    Chargement.setMinimumDuration(5);//Pas de temps mini de chargement*/
+    Chargement.setMinimumDuration(5);//Pas de temps mini de chargement
 
     // compile the display list, store a triangle in it
     glNewList(1, GL_COMPILE);
@@ -179,36 +115,6 @@ void My3DScene::initializeGL()
       { { -1.0, +1.0, +f }, { +1.0, +1.0, +f },
       { +1.0, +1.0, -f }, { -1.0, +1.0, -f } }///face du haut
     };
-    /*static const GLfloat coords[6][4][3] =
-    {
-      { { +f, -1.0, +1.0 }, { +f, -1.0, -1.0 },
-      { +f, +1.0, -1.0 }, { +f, +1.0, +1.0 } },//face de droite
-      { { -f, -1.0, -1.0 }, { -f, -1.0, +1.0 },
-      { -f, +1.0, +1.0 }, { -f, +1.0, -1.0 } },//face de gauche
-      { { +f, -1.0, -1.0 }, { -f, -1.0, -1.0 },
-      { -f, +1.0, -1.0 }, { +f, +1.0, -1.0 } },//face avant
-      { { -f, -1.0, +1.0 }, { +f, -1.0, +1.0 },
-      { +f, +1.0, +1.0 }, { -f, +1.0, +1.0 } },//face arrière
-      { { -f, -1.0, -1.0 }, { +f, -1.0, -1.0 },
-      { +f, -1.0, +1.0 }, { -f, -1.0, +1.0 } },//face du bas
-      { { -f, +1.0, +1.0 }, { +f, +1.0, +1.0 },
-      { +f, +1.0, -1.0 }, { -f, +1.0, -1.0 } }///face du haut
-    };*/
-    /*static const GLfloat coords[6][4][3] =
-    {
-      { { +1.0, -f, +1.0 }, { +1.0, -f, -1.0 },
-      { +1.0, +f, -1.0 }, { +1.0, +f, +1.0 } },//face de droite
-      { { -1.0, -f, -1.0 }, { -1.0, -f, +1.0 },
-      { -1.0, +f, +1.0 }, { -1.0, +f, -1.0 } },//face de gauche
-      { { +1.0, -f, -1.0 }, { -1.0, -f, -1.0 },
-      { -1.0, +f, -1.0 }, { +1.0, +f, -1.0 } },//face avant
-      { { -1.0, -f, +1.0 }, { +1.0, -f, +1.0 },
-      { +1.0, +f, +1.0 }, { -1.0, +f, +1.0 } },//face arrière
-      { { -1.0, -f, -1.0 }, { +1.0, -f, -1.0 },
-      { +1.0, -f, +1.0 }, { -1.0, -f, +1.0 } },//face du bas
-      { { -1.0, +f, +1.0 }, { +1.0, +f, +1.0 },
-      { +1.0, +f, -1.0 }, { -1.0, +f, -1.0 } }///face du haut
-    };*/
     
     int k = 0*colonne*ligne;
     for (int z = 0; z < *NbFichiers; z++) {
@@ -218,47 +124,44 @@ void My3DScene::initializeGL()
             for (int x = 0; x < colonne; x++)
             {
                 Vec3b pixel = (*imgs)[k];
-                //if((pixel[0]==pixel[1])&&(pixel[0]==pixel[2])){ //si noir et blanc
-                    if ((pixel[0] > 40) || (pixel[1] > 40) || (pixel[2] > 40)) {
-                        if ((k < colonne * ligne * 1) || (k > colonne * ligne * (*NbFichiers - 1))) {
-                            for (int i = 0; i < 6; i++)
+                if ((pixel[0] > 40) || (pixel[1] > 40) || (pixel[2] > 40)) {
+                    if ((k < colonne * ligne * 1) || (k > colonne * ligne * (*NbFichiers - 1))) {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            glBegin(GL_QUADS);
+                            for (int j = 0; j < 4; j++)
                             {
-                                glBegin(GL_QUADS);
-                                for (int j = 0; j < 4; j++)
-                                {
-                                    glColor4b(pixel[2], pixel[1], pixel[0], 100);
-                                    glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + f*z);
-                                }
-                                glEnd();
+                                glColor4b(pixel[2], pixel[1], pixel[0], 100);
+                                glVertex3f((coords[i][j][0] + x)/2, (coords[i][j][1] + y)/2, (coords[i][j][2] + f*z)/2);
                             }
-                        }
-
-                        else if ((((*imgs)[k + 1][0] < 40)&&((*imgs)[k + 1][1] < 40)&&((*imgs)[k + 1][2] < 40)) || (((*imgs)[k - 1][0] < 40)&& ((*imgs)[k - 1][1] < 40)&& ((*imgs)[k - 1][2] < 40)) || (((*imgs)[k + colonne][0] < 40)&&((*imgs)[k + colonne][1] < 40)&& ((*imgs)[k + colonne][2] < 40)) || (((*imgs)[k - colonne][0] < 40)&& ((*imgs)[k - colonne][1] < 40)&& ((*imgs)[k - colonne][2] < 40)) || (((*imgs)[k + ligne * colonne][0] < 40)&& ((*imgs)[k + ligne * colonne][1] < 40)&& ((*imgs)[k + ligne * colonne][2] < 40)) || (((*imgs)[k - ligne * colonne][0] < 40)&& ((*imgs)[k - ligne * colonne][1] < 40)&& ((*imgs)[k - ligne * colonne][2] < 40))) {
-                            for (int i = 0; i < 6; i++)
-                            {
-                                glBegin(GL_QUADS);
-                                for (int j = 0; j < 4; j++)
-                                {
-                                    //glColor4b(pixel[0], pixel[1], pixel[2], 100);
-
-                                    glColor4b(pixel[2], pixel[1], pixel[0], 10);
-                                    glVertex3f(coords[i][j][0] + x, coords[i][j][1] + y, coords[i][j][2] + f * z);
-                                }
-                                glEnd();
-                            }
+                            glEnd();
                         }
                     }
-                //}
+
+                    else if ((((*imgs)[k + 1][0] < 40)&&((*imgs)[k + 1][1] < 40)&&((*imgs)[k + 1][2] < 40)) || (((*imgs)[k - 1][0] < 40)&& ((*imgs)[k - 1][1] < 40)&& ((*imgs)[k - 1][2] < 40)) || (((*imgs)[k + colonne][0] < 40)&&((*imgs)[k + colonne][1] < 40)&& ((*imgs)[k + colonne][2] < 40)) || (((*imgs)[k - colonne][0] < 40)&& ((*imgs)[k - colonne][1] < 40)&& ((*imgs)[k - colonne][2] < 40)) || (((*imgs)[k + ligne * colonne][0] < 40)&& ((*imgs)[k + ligne * colonne][1] < 40)&& ((*imgs)[k + ligne * colonne][2] < 40)) || (((*imgs)[k - ligne * colonne][0] < 40)&& ((*imgs)[k - ligne * colonne][1] < 40)&& ((*imgs)[k - ligne * colonne][2] < 40))) {
+                        for (int i = 0; i < 6; i++)
+                        {
+                            glBegin(GL_QUADS);
+                            for (int j = 0; j < 4; j++)
+                            {
+                                glColor4b(pixel[2], pixel[1], pixel[0], 10);
+                                glVertex3f((coords[i][j][0] + x)/2, (coords[i][j][1] + y) / 2, (coords[i][j][2] + f * z) / 2);
+                            }
+                            glEnd();
+                        }
+                    }
+                }
+                
                 
                 k++;
             }
         }
-        //Chargement->setValue(z);
-        
+        Chargement.setValue(z);
+        if (Chargement.wasCanceled())
+            break;
     }
     //Hors de la boucle for, ajout de la valeur max pour fin de chargement
-    //Chargement->setValue(*NbFichiers);
-    //delete Chargement;
+    Chargement.setValue(*NbFichiers);
     glEndList();
 }
 
@@ -268,7 +171,7 @@ void My3DScene::resizeGL(int width, int height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     GLfloat x = (GLfloat)width / height;
-    glFrustum(-x, x, -1.0, 1.0, 15, 6000.0);
+    glFrustum(-x, x, -1.0, 1.0, 15, 10000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -279,8 +182,8 @@ void My3DScene::paintGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     
-    glTranslatef(0.0, 0.0, zoomTy-3000.0);
-    //mouse3DMove();
+    //glTranslatef(0.0, 0.0, zoomZ-3000.0);
+    glTranslatef(TranslationX, TranslationY, zoomZ - 3000.0);
     glRotatef(rotationX, 1.0, 0.0, 0.0);
     glRotatef(rotationY, 0.0, 1.0, 0.0);
     glRotatef(rotationZ, 0.0, 0.0, 1.0);
@@ -289,17 +192,35 @@ void My3DScene::paintGL()
 }
 
 
-
+/*--------------------------------------------------------------------------
+* Fonction : mousePressEvent()
+*
+* Description : Récupération de la dernière position de la souris classique
+*
+* Arguments : event : évènement de la souris classique
+*
+* Valeur retournée : Aucune
+*--------------------------------------------------------------------------*/
 void My3DScene::mousePressEvent(QMouseEvent* event)
 {
     lastPosition = event->pos();
 }
 
+/*--------------------------------------------------------------------------
+* Fonction : mouseMoveEvent()
+*
+* Description : Contrôle de la scène avec la souris classique
+*
+* Arguments : event : évènement de la souris classique
+*
+* Valeur retournée : Aucune
+*--------------------------------------------------------------------------*/
 void My3DScene::mouseMoveEvent(QMouseEvent* event)
 {
 
     GLfloat dx = (GLfloat)(event->x() - lastPosition.x()) / width();
     GLfloat dy = (GLfloat)(event->y() - lastPosition.y()) / height();
+
     if (event->buttons() & Qt::LeftButton)
     {
         rotationX += 180 * dy;
@@ -312,31 +233,18 @@ void My3DScene::mouseMoveEvent(QMouseEvent* event)
         rotationZ += 180 * dx;
         updateGL();
     }
+
     lastPosition = event->pos();
 }
-/*
-void My3DScene::mouse3DMoveEvent(SiSpwEvent* event)
-{
-    GLfloat dx = (GLfloat)(event->x() - lastPosition.x()) / width();
-    GLfloat dy = (GLfloat)(event->y() - lastPosition.y()) / height();
-    if (event->type == SI_MOTION_EVENT)
-    {
-        
-        rotationX += 180 * dy;
-        rotationY += 180 * dx;
-        //updateGL();
-    }
-    else if (event->buttons() & Qt::RightButton)
-    {
-        rotationX += 180 * dy;
-        rotationZ += 180 * dx;
-        //updateGL();
-    }
-    lastPosition = event->pos();
-}
-*/
+
 
 QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
+
+    //Barre de chargement
+    QProgressDialog Prep("Preparation a la reconstruction 3D", "Cancel", 0, *NbFichiers);//Paramètres de la barre
+    Prep.setWindowTitle("Chargement");
+    Prep.setWindowModality(Qt::WindowModal);
+    Prep.setMinimumDuration(5);//Temps mini de chargement
 
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
     ImgVec=new QVector<Vec3b>;
@@ -352,10 +260,8 @@ QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
                 k++;
             }
         }
-        //Mat image;// = Mat::zeros(ligne, colonne, CV_16UC3);
 
-
-        //Application de la couleur et convertion en format adapté
+        //Application de la couleur
         switch (*NbCouleurs)
         {
         case 0:
@@ -384,7 +290,9 @@ QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
             break;
         }
 
-        //QVector<Vec3b> pixels;
+        Prep.setValue(z);
+        if (Prep.wasCanceled())
+            break;
 
         MatIterator_<Vec3b> it, end;
         for (it = image.begin<Vec3b>(), end = image.end<Vec3b>(); it != end; ++it)
@@ -393,7 +301,8 @@ QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
         }
 
     }
-
+    //Hors de la boucle for, ajout de la valeur max pour fin de chargement
+    Prep.setValue(*NbFichiers);
 
     return ImgVec;
 }
@@ -415,17 +324,45 @@ void My3DScene::mouse3DMove()
         return;
 
     //Passage des valeurs globales en locales
+    int h = *compteurTX;
     int l = *compteurTY;
+    int m = *compteurTZ;
     int i = *compteurRX;
     int j = *compteurRY;
     int k = *compteurRZ;
 
 
-    zoomTy = 10*l;
-    if ((-pTy > 5) || (-pTy < -5))
+
+    if ((-pTx > 5)|| (-pTx < -5) || (-pTy > 5) || (-pTy < -5) || (-pTz > 5) || (-pTz < -5) || (-pRx > 5) || (-pRx < -5) || (pRy > 5) || (pRy < -5)|| (pRz > 5) || (pRz < -5))
         updateGL();
     else
         return;
+
+    TranslationX = 10*h;
+    //--------------------------TX------------------------------ -
+    //Conditions de sensibilité de la souris 3D
+    if ((-pTx > 5) && (-pTx >= *precValueTX) && (-pTx < 20)) {
+        h = h - 1;
+    }
+    else if ((-pTx >= 20) && (-pTx >= *precValueTX) && (-pTx < 600)) {
+        h = h - 3;
+    }
+
+    else if ((-pTx < -5) && (-pTx <= *precValueTX) && (-pTx > -20)) {
+        h = h + 1;
+    }
+    else if ((-pTx <= -20) && (-pTx <= *precValueTX) && (-pTx > -600)) {
+        h = h + 3;
+    }
+
+    //Mémorisation de la valeur du NumImageTx
+    *compteurTX = h;
+
+    //Mémorisation de la valeur -pTx de la souris 3D
+    *precValueTX = -pTx;
+
+    zoomZ = 10 * l;
+
     //--------------------------TY-------------------------------
     //Conditions de sensibilité de la souris 3D
     if ((-pTy > 5) && (-pTy >= *precValueTY) && (-pTy < 20)) {
@@ -448,28 +385,47 @@ void My3DScene::mouse3DMove()
     //Mémorisation de la valeur pTy de la souris 3D
     *precValueTY = -pTy;
 
+    TranslationY = 10* m;
 
+    //--------------------------TZ-------------------------------
+    //Conditions de sensibilité de la souris 3D
+    if ((-pTz > 5) && (-pTz >= *precValueTZ) && (-pTz < 20)) {
+        m = m - 1;
+    }
+    else if ((-pTz >= 20) && (-pTz >= *precValueTZ) && (-pTz < 600)) {
+        m = m - 3;
+    }
+
+    else if ((-pTz < -5) && (-pTz <= *precValueTZ) && (-pTz > -20)) {
+        m = m + 1;
+    }
+    else if ((-pTz <= -20) && (-pTz <= *precValueTZ) && (-pTz > -600)) {
+        m = m + 3;
+    }
+
+    //Mémorisation de la valeur du NumImageTx
+    *compteurTZ = m;
+
+    //Mémorisation de la valeur pTz de la souris 3D
+    *precValueTZ = -pTz;
 
     //--------------------------RX-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((i > -360) && (i < 360)) {
         rotationX=i;
-        if ((pRx > 5) || (pRx < -5))
-            updateGL();
-        else
-            return;
+        
         //Conditions de sensibilité de la souris 3D
-        if ((pRx > 5) && (pRx >= *precValueRX) && (pRx < 20)) {
+        if ((-pRx > 5) && (-pRx >= *precValueRX) && (-pRx < 20)) {
             i = i - 1;
         }
-        else if ((pRx >= 20) && (pRx >= *precValueRX) && (pRx < 600)) {
+        else if ((-pRx >= 20) && (-pRx >= *precValueRX) && (-pRx < 600)) {
             i = i - 3;
         }
 
-        else if ((pRx < -5) && (pRx <= *precValueRX) && (pRx > -20)) {
+        else if ((-pRx < -5) && (-pRx <= *precValueRX) && (-pRx > -20)) {
             i = i + 1;
         }
-        else if ((pRx <= -20) && (pRx <= *precValueRX) && (pRx > -600)) {
+        else if ((-pRx <= -20) && (-pRx <= *precValueRX) && (-pRx > -600)) {
             i = i + 3;
         }
     }
@@ -484,30 +440,26 @@ void My3DScene::mouse3DMove()
     //Mémorisation de la valeur du NumImageTx
     *compteurRX = i;
 
-    //Mémorisation de la valeur pRx de la souris 3D
-    *precValueRX = pRx;
+    //Mémorisation de la valeur -pRx de la souris 3D
+    *precValueRX = -pRx;
 
     //--------------------------RY-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((j > -360) && (j < 360)) {
         rotationY=j;
-        if ((-pRy > 5) || (-pRy < -5))
-            updateGL();
-        else
-            return;
 
         //Conditions de sensibilité de la souris 3D
-        if ((-pRy > 5) && (-pRy >= *precValueRY) && (-pRy < 20)) {
+        if ((pRy > 5) && (pRy >= *precValueRY) && (pRy < 20)) {
             j = j - 1;
         }
-        else if ((-pRy >= 20) && (-pRy >= *precValueRY) && (-pRy < 600)) {
+        else if ((pRy >= 20) && (pRy >= *precValueRY) && (pRy < 600)) {
             j = j - 3;
         }
 
-        else if ((-pRy < -5) && (-pRy <= *precValueRY) && (-pRy > -20)) {
+        else if ((pRy < -5) && (pRy <= *precValueRY) && (pRy > -20)) {
             j = j + 1;
         }
-        else if ((-pRy <= -20) && (-pRy <= *precValueRY) && (-pRy > -600)) {
+        else if ((pRy <= -20) && (pRy <= *precValueRY) && (pRy > -600)) {
             j = j + 3;
         }
     }
@@ -523,30 +475,26 @@ void My3DScene::mouse3DMove()
     *compteurRY = j;
 
     //Mémorisation de la valeur pRy de la souris 3D
-    *precValueRY = -pRy;
+    *precValueRY = pRy;
 
 
     //--------------------------RZ-------------------------------
     //Conditions pour avoir une valeur d'angle cohérente
     if ((k > -360) && (k < 360)) {
         rotationZ=k;
-        if ((-pRz > 5) || (-pRz < -5))
-            updateGL();
-        else
-            return;
 
         //Conditions de sensibilité de la souris 3D
-        if ((-pRz > 5) && (-pRz >= *precValueRZ) && (-pRz < 20)) {
+        if ((pRz > 5) && (pRz >= *precValueRZ) && (pRz < 20)) {
             k = k - 1;
         }
-        else if ((-pRz >= 20) && (-pRz >= *precValueRZ) && (-pRz < 600)) {
+        else if ((pRz >= 20) && (pRz >= *precValueRZ) && (pRz < 600)) {
             k = k - 3;
         }
 
-        else if ((-pRz < -5) && (-pRz <= *precValueRZ) && (-pRz > -20)) {
+        else if ((pRz < -5) && (pRz <= *precValueRZ) && (pRz > -20)) {
             k = k + 1;
         }
-        else if ((-pRz <= -20) && (-pRz <= *precValueRZ) && (-pRz > -600)) {
+        else if ((pRz <= -20) && (pRz <= *precValueRZ) && (pRz > -600)) {
             k = k + 3;
         }
     }
@@ -562,8 +510,8 @@ void My3DScene::mouse3DMove()
     //Mémorisation de la valeur du NumImageTx
     *compteurRZ = k;
 
-    //Mémorisation de la valeur -pRz de la souris 3D
-    *precValueRZ = -pRz;
+    //Mémorisation de la valeur pRz de la souris 3D
+    *precValueRZ = pRz;
 
 
 
@@ -579,6 +527,7 @@ My3DScene::My3DScene()
     this->rotationX = 0;
     this->rotationY = 0;
     this->rotationZ = 0;
+    this->zoomZ = 0;
 }
 
 

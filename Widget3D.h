@@ -35,6 +35,10 @@ class Widget3D : public QWidget
 {
 	Q_OBJECT
 
+private:
+	QGridLayout* layout;
+	QSlider* slider;
+
 public:
 	Widget3D();
 	My3DScene* Visualisation3D;
