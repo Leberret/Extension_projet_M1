@@ -235,8 +235,6 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     pathFolder = new QString();
     *pathFolder = QFileDialog::getExistingDirectory(this, "Explorateur de fichiers");//Boite de dialogue sélection dossier
     
-
-
     //Condition d'existence du dossier
     if (pathFolder->isEmpty() || pathFolder->isNull())
         return;
@@ -248,9 +246,6 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
     IntensiteMaxInitCoupe1 = new qint16;
     IntensiteMaxInitCoupe2 = new qint16;
     IntensiteMaxInitCoupe3 = new qint16;
-
-    //Initialisation de la variable globale de ligneResize
-    //ligneResize = new qint16;
 
     //Initialisation des variables globales de l'intensité variables de chaque images
     IntensiteVariableCoupe1 = new qint16;
@@ -357,19 +352,13 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
         ligne = getUShortTagValue(0x00280010, dataDcm);//Nombre de lignes
         colonne = getUShortTagValue(0x00280011, dataDcm);//Nombre de colonnes
 
-
-        //string spaceimg = getStringTagValue(0x00180088, dataDcm);//space between slice (mm)
+        //Position des images
         string spaceimg = getStringTagValue(0x00200032, dataDcm);//image position (mm)
-        //string spaceimg = getStringTagValue(0x00201041, dataDcm);//slice location (mm)
-
-
-
         QString SpaceImg = QString::fromStdString(spaceimg);
         QStringList positionsCoupes = SpaceImg.split("\\");
 
         float PositionCoupe;
 
-        //QVector<float> PositionsVector;
         switch (*coupe) {
         case 1:
             PositionCoupe = positionsCoupes[0].toFloat();
@@ -390,15 +379,13 @@ void Interface::ouvrirFichiers() //Ouvrir le dossier l'image en fonction du posi
             PositionsVector[1] = PositionCoupe;
         }
 
-
+        //Espace entre les pixels
         string spacepixel = getStringTagValue(0x00280030, dataDcm);//space between pixels (mm)        
         QString SpacePixel = QString::fromStdString(spacepixel);
         QStringList SpaceList = SpacePixel.split("\\");
 
-
         if (NbFichier == (*NbFichiers / 4)) {
             EcartPixel = SpaceList[0].toFloat();
-
         }
 
         pixels = readPixels(dataDcm); //Lecture des pixesls
@@ -1436,20 +1423,11 @@ void Interface::SaveAs() {
 void Interface::GestionImages(int NumeroImage)
 {
     //Création d'un image vide de la taille obtenue dans OuvrirFichier
-    //Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
     Mat image = Mat::zeros(ligne, colonne, CV_8UC1);
 
-    //vector<Mat> planes;
-
-        //Mise en local des dimensions de l'image recréée
+    //Mise en local des dimensions de l'image recréée
     int l = image.rows;
     int c = image.cols;
-
-    // Séparation des canaux d'une image.
-    //split(image, planes); 	// planes[0], planes[1] et planes[2] contiennent respectivement les canaux Blue,
-	// Green et Red.
-
-
 
     //Initialisation de l'intensité max
     int valMax = 0;
@@ -1475,7 +1453,7 @@ void Interface::GestionImages(int NumeroImage)
 
     //Récupération de l'emplacement dans le vecteur global de la première valeur de l'image prise en argument 
     int k = (colonne * ligne) * NumeroImage;
-    //memcpy(image.data, ((*allpixels)).data(), (*allpixels).size()*sizeof(unsigned short));
+
     //Reconstrution de l'image dans la matrice
     for (int i = 0; i < l; i++) {
         for (int j = 0; j < c; j++)
@@ -1492,14 +1470,6 @@ void Interface::GestionImages(int NumeroImage)
         }
     }
 
-    //Mat Rimage = Mat(ligne, colonne, CV_8UC1);
-    //cv::resize(image, Rimage, Rimage.size());
-
-   /* Mat result;
-    Rect rectangle(0, 10, c-1 , l-10 );
-    Mat bgdModel, fgdModel; // the models (internally used)
-    // Generate output image
-    Mat foreground(image.size(), CV_8UC3, Scalar(0, 0, 255));*/
     //Application de la couleur et convertion en format adapté
     switch (*NbCouleurs)
     {
@@ -1510,17 +1480,6 @@ void Interface::GestionImages(int NumeroImage)
         applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
         dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
-    /*case 1:
-        applyColorMap(image, image, COLORMAP_JET);//Application de la couleur a l'image
-        
-        grabCut(image, result, rectangle, bgdModel, fgdModel, 1, GC_INIT_WITH_RECT);
-        compare(result, GC_PR_FGD, result, CMP_EQ);
-
-
-        image.copyTo(foreground, result); // bg pixels not copied
-            
-        dest = QImage((uchar*)foreground.data, foreground.cols, foreground.rows, foreground.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
-        break;*/
     case 2:
         applyColorMap(image, image, COLORMAP_BONE);//Application de la couleur a l'image
         dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
@@ -1546,15 +1505,7 @@ void Interface::GestionImages(int NumeroImage)
         dest = QImage((uchar*)image.data, image.cols, image.rows, image.step, QImage::Format_BGR888); //Conversion d'un MAT en QImage
         break;
     }
-    /*
-    //Changement de la longueur des colonnes et des lignes
-    if (l < 400 && c < 400) //Si image de petite taille
-    {
-        l = 1.75 * l;//Coeff de 1.75
-        c = 1.75 * c;//Coeff de 1.75
-    }*/
-
-
+    
     //Affichage de l'image dans la fenêtre principale
     if (*Mode == 0)
     {

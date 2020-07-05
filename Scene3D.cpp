@@ -107,13 +107,12 @@ void My3DScene::initializeGL()
     };
     
     //Valeurs seuils
-    int BackColorB=(*imgs)[0][0]+40;
-    int BackColorG = (*imgs)[0][1] + 40;
-    int BackColorR = (*imgs)[0][2] + 40;
+    int BackColorB = (*imgs)[1][0] + 40;
+    int BackColorG = (*imgs)[1][1] + 40;
+    int BackColorR = (*imgs)[1][2] + 40;
 
 
-    //int Milieu = (int)((Max - Min) / 2);
-
+    int e = 3;
 
     //Reconstruction 3D
     int k = 0;
@@ -137,8 +136,8 @@ void My3DScene::initializeGL()
                             glEnd();
                         }
                     }
-
-                    else if ((((*imgs)[k + 1][0] < BackColorB)&&((*imgs)[k + 1][1] < BackColorG)&&((*imgs)[k + 1][2] < BackColorR)) || (((*imgs)[k - 1][0] < BackColorB)&& ((*imgs)[k - 1][1] < BackColorG)&& ((*imgs)[k - 1][2] < BackColorR)) || (((*imgs)[k + colonne][0] < BackColorB)&&((*imgs)[k + colonne][1] < BackColorG)&& ((*imgs)[k + colonne][2] < BackColorR)) || (((*imgs)[k - colonne][0] < BackColorB)&& ((*imgs)[k - colonne][1] < BackColorG)&& ((*imgs)[k - colonne][2] < BackColorR)) || (((*imgs)[k + ligne * colonne][0] < BackColorB)&& ((*imgs)[k + ligne * colonne][1] < BackColorG)&& ((*imgs)[k + ligne * colonne][2] < BackColorR)) || (((*imgs)[k - ligne * colonne][0] < BackColorB)&& ((*imgs)[k - ligne * colonne][1] < BackColorG)&& ((*imgs)[k - ligne * colonne][2] < BackColorR))) {
+                    
+                    else if ((((*imgs)[k + e][0] < BackColorB)&&((*imgs)[k + e][1] < BackColorG)&&((*imgs)[k + e][2] < BackColorR)) || (((*imgs)[k - e][0] < BackColorB)&& ((*imgs)[k - e][1] < BackColorG)&& ((*imgs)[k - e][2] < BackColorR)) || (((*imgs)[k + e*colonne][0] < BackColorB)&&((*imgs)[k + e*colonne][1] < BackColorG)&& ((*imgs)[k + e*colonne][2] < BackColorR)) || (((*imgs)[k - e*colonne][0] < BackColorB)&& ((*imgs)[k - e*colonne][1] < BackColorG)&& ((*imgs)[k - colonne][2] < BackColorR)) || (((*imgs)[k + e*ligne * colonne][0] < BackColorB)&& ((*imgs)[k + e*ligne * colonne][1] < BackColorG)&& ((*imgs)[k + e*ligne * colonne][2] < BackColorR)) || (((*imgs)[k - e*ligne * colonne][0] < BackColorB)&& ((*imgs)[k - e*ligne * colonne][1] < BackColorG)&& ((*imgs)[k - e*ligne * colonne][2] < BackColorR))) {
                         for (int i = 0; i < 6; i++)
                         {
                             glBegin(GL_QUADS);
