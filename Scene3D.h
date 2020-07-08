@@ -49,8 +49,8 @@ private:
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
+	void wheelEvent(QWheelEvent* event);
 
-	//void mouse3DMoveEvent(SiSpwEvent* pEvent);
 	QVector<Vec3b>* VectorImages(QVector<unsigned short>* all);
 
 	//Variables globales

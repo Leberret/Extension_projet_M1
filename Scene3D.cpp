@@ -112,7 +112,7 @@ void My3DScene::initializeGL()
     int BackColorR = (*imgs)[1][2] + 40;
 
 
-    int e = 3;
+    int e = 1;
 
     //Reconstruction 3D
     int k = 0;
@@ -239,18 +239,23 @@ void My3DScene::mouseMoveEvent(QMouseEvent* event)
 
     if (event->buttons() & Qt::LeftButton)
     {
-        zoomZ += 1800 * dy;
-        rotationY += 180 * dx;
+        TranslationY -= 500 * dy;
+        TranslationX += 500 * dx;
         updateGL();
     }
     else if (event->buttons() & Qt::RightButton)
     {
         rotationX += 180 * dy;
-        rotationZ += 180 * dx;
+        rotationY += 180 * dx;
         updateGL();
     }
 
     lastPosition = event->pos();
+}
+
+void My3DScene::wheelEvent(QWheelEvent* event) {
+    zoomZ+= (GLfloat)event->delta();
+    updateGL();
 }
 
 /*--------------------------------------------------------------------------
@@ -279,8 +284,11 @@ QVector<Vec3b>* My3DScene::VectorImages(QVector<unsigned short>* all) {
         {
             for (int x = 0; x < colonne; x++)
             {
-                // get pixel 
-                image.at<uchar>(y, x) = (*all)[k];
+                // get pixel
+                //if ((*all)[k] > 40)
+                    image.at<uchar>(y, x) = (*all)[k];
+                /*else
+                    image.at<uchar>(y, x) = 0;*/
                 k++;
             }
         }
